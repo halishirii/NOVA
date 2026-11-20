@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -21,6 +22,7 @@
             --ring-color: #1d63ed;
         }
 
+        /* Dark Theme (تیره) */
         [data-theme="dark"] {
             --bg-main: #0b1120;
             --bg-card: #131c31;
@@ -35,6 +37,7 @@
             --ring-color: #3b82f6;
         }
 
+        /* Blue / Deep Navy Theme (آبی) */
         [data-theme="blue"] {
             --bg-main: #0a192f;
             --bg-card: #112240;
@@ -49,6 +52,7 @@
             --ring-color: #38bdf8;
         }
 
+        /* Pink Theme (صورتی) */
         [data-theme="pink"] {
             --bg-main: #fdf2f8;
             --bg-card: #ffffff;
@@ -184,9 +188,10 @@
     <div id="appShell" class="max-w-md mx-auto min-h-screen relative flex flex-col">
 
         <!-- ========================================================= -->
-        <!-- 1. LOGIN SCREEN                                           -->
+        <!-- 1. LOGIN SCREEN (Matching PouyaVision Screenshot 1)       -->
         <!-- ========================================================= -->
         <section id="loginScreen" class="min-h-screen flex flex-col justify-between p-4 relative">
+            <!-- Top Bar: Cloud Connection Status (Right) + Theme Palette Button (Top-Left) -->
             <div class="flex justify-between items-center pt-1">
                 <div class="pv-card px-3 py-2 text-[11px] font-bold flex items-center gap-1.5">
                     <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -201,7 +206,9 @@
                 </button>
             </div>
 
+            <!-- Main White Login Card -->
             <div class="pv-card p-6 my-auto space-y-5">
+                <!-- Custom NOVA Typography Logo & Slogan -->
                 <div class="flex flex-col items-center text-center space-y-1">
                     <div class="flex items-center justify-center gap-2" dir="ltr">
                         <svg class="w-9 h-9" viewBox="0 0 40 40" fill="none">
@@ -219,6 +226,7 @@
                     </h1>
                 </div>
 
+                <!-- Login Form -->
                 <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3.5">
                     <div>
                         <input type="text" id="loginUsername" required placeholder="نام کاربری"
@@ -234,6 +242,143 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
+                        </button>
+                    </div>
+
+                    <div>
+                        <input type="text" id="loginCaptchaInput" required placeholder="عبارت امنیتی را وارد کنید"
+                            class="w-full pv-input px-4 py-3.5 text-sm font-medium text-right" maxlength="6">
+                    </div>
+
+                    <!-- Captcha Refresh + Struck-through Code Box -->
+                    <div class="flex items-center justify-center gap-3 pt-1" dir="ltr">
+                        <button type="button" onclick="refreshCaptcha()" title="تغییر کد امنیتی"
+                            class="w-11 h-11 pv-btn-primary rounded-xl flex items-center justify-center shadow-sm cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                        <div class="pv-subtle px-6 py-2.5 rounded-xl flex items-center justify-center min-w-[144px]">
+                            <span id="captchaDisplay" class="text-xl font-extrabold tracking-[0.28em] line-through decoration-2" style="color: var(--text-primary);">TSLU</span>
+                        </div>
+                    </div>
+
+                    <!-- Primary Login Button -->
+                    <button type="submit" class="w-full pv-btn-primary py-3.5 rounded-2xl font-bold text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer mt-2">
+                        <span>ورود</span>
+                        <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Quick Demo Fill Hint -->
+                <div class="pt-3 border-t flex items-center justify-between text-[11px]" style="border-color: var(--border-color);">
+                    <span class="pv-muted">پیش‌فرض مدیر: <b class="font-bold">admin</b> / <b class="font-bold">1234</b></span>
+                    <button type="button" onclick="quickFillDemoUser()" class="px-3 py-1.5 rounded-xl font-bold pv-soft-badge cursor-pointer">
+                        پر کردن سریع
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center text-[11px] pv-muted pb-2">
+                متصل به فضای ابری Firebase • پروژه nova-archive01
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- 2. AUTHENTICATED MAIN APP SHELL                           -->
+        <!-- ========================================================= -->
+        <section id="mainAppScreen" class="hidden min-h-screen flex-col pb-28">
+
+            <!-- Top Header (Matching PouyaVision Screenshot 2 & 4) -->
+            <header class="px-4 pt-4 pb-3 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md" style="background-color: color-mix(in srgb, var(--bg-main) 88%, transparent);">
+                <!-- Right Side (in RTL): Avatar + Time Greeting + Full Name -->
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full p-0.5 flex items-center justify-center font-extrabold text-base text-white shadow-sm shrink-0"
+                        style="background: linear-gradient(135deg, var(--accent), #0ea5e9);" id="headerUserAvatar">
+                        ح
+                    </div>
+                    <div class="text-right">
+                        <div id="headerGreeting" class="text-xs font-medium flex items-center gap-1 pv-muted">
+                            <span>شب بخیر</span>
+                            <span>🌙</span>
+                        </div>
+                        <div id="headerUserName" class="text-sm font-extrabold">حسین علی‌شیری</div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="headerCloudBadge" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full pv-soft-badge">
+                                <span id="headerCloudDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span id="headerCloudText">Online • ابری</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Left Side (in RTL): Theme Palette & Logout Buttons -->
+                <div class="flex items-center gap-2">
+                    <button onclick="openThemeSheet()" title="انتخاب تم" aria-label="انتخاب تم"
+                        class="w-11 h-11 pv-card rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-85 transition">
+                        <svg class="w-5 h-5" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                    </button>
+
+                    <button onclick="handleLogout()" title="خروج از حساب" aria-label="خروج از حساب"
+                        class="w-11 h-11 pv-card rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-85 transition">
+                        <svg class="w-5 h-5" style="color: var(--text-primary);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ========================================================= -->
+            <!-- TAB 1: HOME DASHBOARD (Matching Screenshot 2)             -->
+            <!-- ========================================================= -->
+            <div id="tabHome" class="px-4 space-y-4">
+                <!-- Daily Program Summary Card -->
+                <div class="pv-card p-4 space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <h2 id="homeDateHeading" class="text-sm font-extrabold">برنامه امروز ۳۰ آبان</h2>
+                        <span id="homeProgressBadge" class="text-[11px] font-bold px-3 py-1 rounded-full pv-soft-badge">
+                            ۰ از ۷ انجام شد
+                        </span>
+                    </div>
+
+                    <!-- 3 Stat Boxes: ویزیت امروز / انجام شده / در انتظار تکمیل -->
+                    <div class="grid grid-cols-3 gap-2.5 text-center">
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statTotalVisits" class="text-lg font-extrabold">۷</div>
+                            <div class="text-[11px] pv-muted mt-0.5">ویزیت امروز</div>
+                        </div>
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statCompletedVisits" class="text-lg font-extrabold">۰</div>
+                            <div class="text-[11px] pv-muted mt-0.5">انجام شده</div>
+                        </div>
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statPendingVisits" class="text-lg font-extrabold">۰</div>
+                            <div class="text-[11px] pv-muted mt-0.5 leading-tight">در انتظار تکمیل</div>
+                        </div>
+                    </div>
+
+                    <!-- Blue Progress Bar -->
+                    <div class="w-full h-2 rounded-full overflow-hidden" style="background-color: var(--bg-subtle);">
+                        <div id="homeProgressBar" class="h-full rounded-full transition-all duration-300" style="width: 0%; background-color: var(--accent);"></div>
+                    </div>
+                </div>
+
+                <!-- Golden Bonus / Monthly Target Card -->
+                <div class="pv-card p-4">
+                    <button onclick="toggleBonusAccordion()" class="w-full flex items-center justify-between text-right cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="pv-icon-tile w-11 h-11 shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-extrabold">طرح پاداش طلایی نووآ</div>
+                                <div id="bonusRemainingText" class="text-[11px] font-bold mt-0.5" style="color: var(--a           </svg>
                         </button>
                     </div>
 
