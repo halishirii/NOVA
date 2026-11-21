@@ -1,2 +1,0 @@
-# NOVA
-Medical Rep archive
