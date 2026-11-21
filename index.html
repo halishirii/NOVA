@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0f1214"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<style>html{color-scheme:light}[hidden]{display:none!important}body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}a.btn{text-decoration:none;display:inline-flex;align-items:center;color:inherit}</style>
+<title>NOVA</title>
+<style>
+/* Layout: sticky top bar, list on the start side, profile beside it; on phones the profile slides over the list. */
+:root{
+  --bg:#f5f6f7; --surface:#ffffff; --fg:#15191d; --muted:#67737e; --line:#e1e5e8;
+  --accent:#0e6b66; --accent-fg:#ffffff; --soft:#e8f1f0;
+  --warn:#8a5200; --warn-bg:#fbf1dc; --danger:#b3261e;
+  --font:'Vazirmatn',Tahoma,system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1214; --surface:#171b1e; --fg:#e8ecef; --muted:#8b97a2; --line:#262c31;
+  --accent:#4cc2b8; --accent-fg:#06201e; --soft:#15302e;
+  --warn:#e8b45a; --warn-bg:#2b2310; --danger:#f2867f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1214; --surface:#171b1e; --fg:#e8ecef; --muted:#8b97a2; --line:#262c31;
+  --accent:#4cc2b8; --accent-fg:#06201e; --soft:#15302e;
+  --warn:#e8b45a; --warn-bg:#2b2310; --danger:#f2867f; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:auto}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.wrap{max-width:1120px;margin:0 auto}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding-block:12px 10px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;font-weight:300;letter-spacing:.42em;font-size:18px;direction:ltr;margin-inline-end:6px}
+.logo{width:36px;height:36px;border-radius:9px;object-fit:cover;flex:none;background:#000}
+.tabs{display:flex;gap:2px}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:6px 12px;color:var(--muted);font-weight:500;min-height:40px}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.tab small{color:var(--muted);font-weight:400;margin-inline-start:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-inline-start:auto}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 14px;min-height:40px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.small{min-height:32px;padding:2px 10px;font-size:13px}
+.btn.danger{color:var(--danger)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.notice{margin-top:12px;padding:8px 12px;border-radius:8px;background:var(--warn-bg);color:var(--warn);font-size:13px}
+.main{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:24px;padding-block:18px 60px;align-items:start}
+.listcol{min-width:0}
+.search{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;min-height:42px}
+.count{color:var(--muted);font-size:13px;margin:10px 2px 6px}
+.list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.item{display:block;width:100%;text-align:start;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 6px;min-width:0}
+.item:hover{background:var(--surface)}
+.item[aria-current="true"]{background:var(--surface);box-shadow:inset 3px 0 0 var(--accent)}
+.item .nm{font-weight:500;display:flex;gap:8px;align-items:center;min-width:0}
+.item .nm span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .sub{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--warn);flex:none}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:28px 18px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:14px}
+.empty b{color:var(--fg);font-weight:500}
+
+.profile{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px)}
+.ph{color:var(--muted);text-align:center;padding:60px 10px}
+.pbar{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.pbar h2{font-size:19px;font-weight:600;margin:0;flex:1;min-width:0;overflow-wrap:anywhere;text-wrap:balance}
+.back{display:none}
+.badge{font-size:12px;border-radius:999px;padding:1px 10px;background:var(--soft);color:var(--accent);white-space:nowrap}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.banner a{color:inherit}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f.full{grid-column:1/-1}
+.f label,.lbl{font-size:13px;color:var(--muted)}
+.f input,.f textarea,.f select,.sheetbox textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;min-height:42px;resize:vertical}
+.inline{display:flex;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--bg);overflow:hidden;min-height:32px}
+.chip button{background:none;border:0;padding:2px 10px;min-height:30px}
+.chip .x{color:var(--muted);padding:2px 9px;border-inline-start:1px solid var(--line)}
+.foot{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.foot .sp{margin-inline-start:auto}
+
+.overlay{position:fixed;inset:0;background:rgba(10,14,16,.5);z-index:40;display:flex;align-items:flex-start;justify-content:center;overflow:auto;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) max(12px,env(safe-area-inset-left,0px)) 24px max(12px,env(safe-area-inset-right,0px))}
+.sheetbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;width:100%;max-width:640px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.sheetbox h2{margin:0;font-size:18px;font-weight:600;flex:1}
+.shead{display:flex;align-items:center;gap:10px}
+.hint{font-size:13px;color:var(--muted)}
+.hint a{color:var(--accent)}
+.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.res{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.rit{display:flex;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);align-items:flex-start;min-width:0}
+.rit input{margin-top:6px;flex:none;width:18px;height:18px}
+.rit .b{min-width:0;flex:1}
+.rit .nm{font-weight:500;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rit .d{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.err{color:var(--danger);font-size:13px}
+
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:14px;z-index:60;max-width:calc(100% - 32px);text-align:center}
+
+.filebtn{position:relative;display:inline-flex;align-items:center;overflow:hidden}
+.filebtn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
+.mapbox{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:12px}
+.maprid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inl{display:flex;gap:8px;align-items:center}
+.inl input{width:18px;height:18px}
+.notice.ok{background:var(--soft);color:var(--accent)}
+.notice button{margin-inline-start:10px}
+.f input.bad,.f textarea.bad{border-color:var(--danger)}
+.fixrow{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:6px}
+.rit .fixrow input{width:100%;height:auto;min-height:38px;margin-top:0;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 10px}
+@media (max-width:899px){
+  .main{grid-template-columns:minmax(0,1fr)}
+  .profile{display:none}
+  .main.open .profile{display:block;position:fixed;inset:0;z-index:35;border-radius:0;border:0;overflow:auto;
+    padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 28px) max(16px,env(safe-area-inset-left,0px))}
+  .back{display:inline-flex}
+  .ph{display:none}
+}
+@media (max-width:560px){.form,.maprid{grid-template-columns:1fr}.actions{margin-inline-start:0;width:100%}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" dir="rtl" lang="fa">
+  <header class="top">
+    <div class="brand"><img class="logo" width="36" height="36" alt="" src="data:image/jpeg;base64,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"><span>NOVA</span></div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="actions" id="actions"></div>
+  </header>
+  <div id="notices"></div>
+  <div class="main" id="main">
+    <section class="listcol" aria-label="فهرست">
+      <input class="search" id="q" type="search" placeholder="جستجو در آرشیو" autocomplete="off" dir="auto">
+      <div class="count" id="count"></div>
+      <div class="list" id="list"></div>
+    </section>
+    <section class="profile" id="profile" aria-label="پروفایل"></section>
+  </div>
+</div>
+<div class="overlay" id="sheet" hidden><div class="sheetbox" role="dialog" aria-modal="true" aria-label="افزودن"></div></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+/* XL: small offline .xlsx reader/writer (no dependencies). Reads the first sheet as rows; writes sheets of text cells. */
+const XL=(()=>{
+const te=new TextEncoder(),td=new TextDecoder('utf-8');
+let CT=null;
+function crc32(b){
+  if(!CT){CT=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);CT[n]=c>>>0;}}
+  let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CT[(c^b[i])&255]^(c>>>8);
+  return (c^0xFFFFFFFF)>>>0;
+}
+async function inflateRaw(u8){
+  const s=new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(s).arrayBuffer());
+}
+async function unzip(buf){
+  const u=new Uint8Array(buf),dv=new DataView(u.buffer,u.byteOffset,u.byteLength);
+  let e=u.length-22;
+  while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;
+  if(e<0)throw new Error('not a zip');
+  const count=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const ent={};
+  for(let i=0;i<count;i++){
+    if(dv.getUint32(p,true)!==0x02014b50)throw new Error('bad zip');
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),
+      el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    ent[td.decode(u.subarray(p+46,p+46+nl))]={method,csize,off};
+    p+=46+nl+el+cl;
+  }
+  return {names:Object.keys(ent),get:async name=>{
+    const f=ent[name];if(!f)return null;
+    const ln=dv.getUint16(f.off+26,true),le=dv.getUint16(f.off+28,true),s=f.off+30+ln+le,d=u.subarray(s,s+f.csize);
+    return f.method===0?d:await inflateRaw(d);
+  }};
+}
+const ent=s=>s.replace(/&(#x[0-9a-fA-F]+|#\d+|amp|lt|gt|quot|apos);/g,(m,x)=>
+  x==='amp'?'&':x==='lt'?'<':x==='gt'?'>':x==='quot'?'"':x==='apos'?"'":
+  String.fromCodePoint(x[1]==='x'?parseInt(x.slice(2),16):parseInt(x.slice(1),10)));
+const esc=s=>String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const colIdx=s=>{let n=0;for(const ch of s)n=n*26+ch.charCodeAt(0)-64;return n-1;};
+const colName=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;};
+function textOf(x){
+  const re=/<(?:\w+:)?t(?:\s[^>]*)?(?:\/>|>([\s\S]*?)<\/(?:\w+:)?t>)/g;let m,o='';
+  while((m=re.exec(x)))o+=ent(m[1]||'');
+  return o;
+}
+function parseSST(x){
+  const out=[],re=/<(?:\w+:)?si(?:\s[^>]*)?(?:\/>|>([\s\S]*?)<\/(?:\w+:)?si>)/g;let m;
+  while((m=re.exec(x))){
+    out.push(m[1]?textOf(m[1].replace(/<(?:\w+:)?rPh[\s\S]*?<\/(?:\w+:)?rPh>/g,'')):'');
+  }
+  return out;
+}
+function parseSheet(x,sst){
+  const rows=[],reR=/<(?:\w+:)?row(?:\s[^>]*)?(?:\/>|>([\s\S]*?)<\/(?:\w+:)?row>)/g;let rm,ri=0;
+  while((rm=reR.exec(x))){
+    const rowTag=rm[0].slice(0,rm[0].indexOf('>')+1);
+    const rn=/\sr="(\d+)"/.exec(rowTag);const r=rn?Number(rn[1])-1:ri;ri=r+1;
+    const cells=[];
+    if(rm[1]){
+      const reC=/<(?:\w+:)?c(\s[^>]*?)?(?:\/>|>([\s\S]*?)<\/(?:\w+:)?c>)/g;let cm,ci=0;
+      while((cm=reC.exec(rm[1]))){
+        const at=cm[1]||'',ref=/\sr="([A-Z]+)\d+"/.exec(at),c=ref?colIdx(ref[1]):ci;ci=c+1;
+        const t=(/\st="(\w+)"/.exec(at)||[])[1]||'n',body=cm[2]||'';let v='';
+        if(t==='inlineStr')v=textOf(body);
+        else{
+          const vm=/<(?:\w+:)?v(?:\s[^>]*)?>([\s\S]*?)<\/(?:\w+:)?v>/.exec(body),raw=vm?ent(vm[1]):'';
+          v=t==='s'?(sst[Number(raw)]==null?'':sst[Number(raw)]):t==='b'?(raw==='1'?'TRUE':'FALSE'):raw;
+        }
+        cells[c]=v;
+      }
+    }
+    while(rows.length<r)rows.push([]);
+    rows[r]=Array.from(cells,v=>v==null?'':v);
+  }
+  return rows;
+}
+async function read(buf){
+  const z=await unzip(buf);
+  const text=async n=>{const d=await z.get(n);return d?td.decode(d):null;};
+  const wb=await text('xl/workbook.xml');
+  if(wb==null)throw new Error('not xlsx');
+  let path='xl/worksheets/sheet1.xml';
+  const sh=/<(?:\w+:)?sheet\s[^>]*?r:id="([^"]+)"/.exec(wb),rels=await text('xl/_rels/workbook.xml.rels');
+  if(sh&&rels){
+    const rr=new RegExp('<Relationship\\s[^>]*?Id="'+sh[1]+'"[^>]*>').exec(rels);
+    if(rr){const tg=/Target="([^"]+)"/.exec(rr[0]);if(tg)path=tg[1].startsWith('/')?tg[1].slice(1):'xl/'+tg[1];}
+  }
+  const sx=await text(path);
+  if(sx==null)throw new Error('no sheet');
+  const sstx=await text('xl/sharedStrings.xml');
+  return parseSheet(sx,sstx?parseSST(sstx):[]);
+}
+const u16=n=>[n&255,(n>>>8)&255];
+const u32=n=>[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];
+function zip(files){
+  const parts=[],cen=[];let off=0;
+  for(const f of files){
+    const nm=te.encode(f.name),crc=crc32(f.data),sz=f.data.length;
+    parts.push(new Uint8Array([0x50,0x4b,3,4,...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(sz),...u32(sz),...u16(nm.length),...u16(0)]),nm,f.data);
+    cen.push(new Uint8Array([0x50,0x4b,1,2,...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(sz),...u32(sz),...u16(nm.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nm);
+    off+=30+nm.length+sz;
+  }
+  let cs=0;for(const c of cen)cs+=c.length;
+  const end=new Uint8Array([0x50,0x4b,5,6,...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cs),...u32(off),...u16(0)]);
+  const all=[...parts,...cen,end];let n=0;for(const a of all)n+=a.length;
+  const out=new Uint8Array(n);let p=0;for(const a of all){out.set(a,p);p+=a.length;}
+  return out;
+}
+function sheetXml(rows,widths){
+  let x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView rightToLeft="1" workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/>';
+  if(widths&&widths.length)x+='<cols>'+widths.map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('')+'</cols>';
+  x+='<sheetData>';
+  rows.forEach((r,ri)=>{
+    x+='<row r="'+(ri+1)+'">';
+    r.forEach((v,ci)=>{
+      v=v==null?'':String(v);if(v==='')return;
+      x+='<c r="'+colName(ci)+(ri+1)+'" t="inlineStr" s="'+(ri===0?1:2)+'"><is><t xml:space="preserve">'+esc(v)+'</t></is></c>';
+    });
+    x+='</row>';
+  });
+  return x+'</sheetData></worksheet>';
+}
+const STYLES='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf></cellXfs></styleSheet>';
+function write(sheets){
+  const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',f=(name,s)=>({name,data:te.encode(s)});
+  const files=[
+    f('[Content_Types].xml',H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+sheets.map((s,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')+'</Types>'),
+    f('_rels/.rels',H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'),
+    f('xl/workbook.xml',H+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+sheets.map((s,i)=>'<sheet name="'+esc(String(s.name).replace(/[\[\]:*?\/\\]/g,' ').slice(0,31))+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('')+'</sheets></workbook>'),
+    f('xl/_rels/workbook.xml.rels',H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sheets.map((s,i)=>'<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')+'<Relationship Id="rId'+(sheets.length+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'),
+    f('xl/styles.xml',STYLES),
+    ...sheets.map((s,i)=>f('xl/worksheets/sheet'+(i+1)+'.xml',sheetXml(s.rows,s.widths)))
+  ];
+  return zip(files);
+}
+return {read,write};
+})();
+if(typeof module!=='undefined')module.exports=XL;
+
+/* NOVA local storage shim: gives the page the same db/downloads interface that Claude hosting provides, backed by IndexedDB. */
+(function(){
+  const DBN='nova-archive',ST='docs',mem=new Map(),subs=new Map();
+  let idb=null;
+  const fail=e=>({code:'unavailable',message:String(e&&e.message||e)});
+  const open=()=>new Promise((res,rej)=>{
+    if(!window.indexedDB)return rej(new Error('no indexedDB'));
+    let rq;try{rq=indexedDB.open(DBN,1);}catch(e){return rej(e);}
+    rq.onupgradeneeded=()=>{rq.result.createObjectStore(ST);};
+    rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);rq.onblocked=()=>rej(new Error('blocked'));
+  });
+  const loadAll=db=>new Promise((res,rej)=>{
+    const tx=db.transaction(ST,'readonly'),s=tx.objectStore(ST),k=s.getAllKeys(),v=s.getAll();
+    tx.oncomplete=()=>{k.result.forEach((key,i)=>mem.set(key,v.result[i]));res();};tx.onerror=()=>rej(tx.error);
+  });
+  const put=(k,v)=>new Promise((res,rej)=>{
+    if(!idb)return res();
+    try{const tx=idb.transaction(ST,'readwrite');tx.objectStore(ST).put(v,k);tx.oncomplete=()=>res();tx.onerror=tx.onabort=()=>rej(fail(tx.error));}catch(e){rej(fail(e));}
+  });
+  const rm=k=>new Promise((res,rej)=>{
+    if(!idb)return res();
+    try{const tx=idb.transaction(ST,'readwrite');tx.objectStore(ST).delete(k);tx.oncomplete=()=>res();tx.onerror=tx.onabort=()=>rej(fail(tx.error));}catch(e){rej(fail(e));}
+  });
+  const meta={fromCache:false,hasPendingWrites:false};
+  function snapshot(col){
+    const pre=col+'/',docs=[];
+    for(const [k,v] of mem)if(k.startsWith(pre)&&k.indexOf('/',pre.length)<0)docs.push({id:k.slice(pre.length),exists:true,data:()=>v,metadata:meta});
+    return {docs,size:docs.length,empty:!docs.length,metadata:meta};
+  }
+  const pend=new Set();let tm=0;
+  function notify(col){
+    pend.add(col);if(tm)return;
+    tm=setTimeout(()=>{tm=0;const cs=[...pend];pend.clear();for(const c of cs)for(const f of (subs.get(c)||[])){try{f(snapshot(c));}catch(e){console.error(e);}}},30);
+  }
+  const newId=()=>{const a=new Uint8Array(10);crypto.getRandomValues(a);return 'n'+Array.from(a,b=>b.toString(36).padStart(2,'0')).join('');};
+  const docRef=(col,did)=>({id:did,path:col+'/'+did,
+    async get(){const v=mem.get(col+'/'+did);return {id:did,exists:v!==undefined,data:()=>v,metadata:meta};},
+    async set(data){const v=JSON.parse(JSON.stringify(data));await put(col+'/'+did,v);mem.set(col+'/'+did,v);notify(col);},
+    async delete(){await rm(col+'/'+did);mem.delete(col+'/'+did);notify(col);}});
+  const DB={
+    collection:col=>({path:col,doc:did=>docRef(col,did||newId()),
+      onSnapshot(next){if(!subs.has(col))subs.set(col,new Set());subs.get(col).add(next);setTimeout(()=>{try{next(snapshot(col));}catch(e){console.error(e);}},0);return()=>subs.get(col).delete(next);}}),
+    doc:path=>{const i=path.indexOf('/');return docRef(path.slice(0,i),path.slice(i+1));}
+  };
+  const MIME={xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',csv:'text/csv;charset=utf-8'};
+  const DL={async save({filename,data}){
+    const ext=(filename.split('.').pop()||'').toLowerCase();
+    const b=new Blob([data],{type:MIME[ext]||'application/octet-stream'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download=filename;document.body.append(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
+    return {status:'saved'};
+  }};
+  const ready=(async()=>{
+    try{idb=await open();await loadAll(idb);}catch(e){idb=null;window.__NOVA_MEM=true;}
+    try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+  })();
+  window.claude={use:async n=>{if(n==='db'){await ready;return DB;}if(n==='downloads')return DL;return null;}};
+  try{
+    if(/\.github\.io$/i.test(location.hostname)){
+      const repo=location.pathname.split('/').filter(Boolean)[0];
+      if(repo)window.NOVA_FEEDBACK='https://github.com/'+location.hostname.split('.')[0]+'/'+repo+'/issues/new';
+    }
+  }catch(e){}
+})();
+</script>
+<script>
+document.documentElement.dir='rtl';document.documentElement.lang='fa';
+
+const $=s=>document.querySelector(s);
+function h(tag,attrs,...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs||{})){
+    if(v==null||v===false)continue;
+    if(k==='class')e.className=v;
+    else if(k==='text')e.textContent=v;
+    else if(k==='value')e.value=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else if(v===true)e.setAttribute(k,'');
+    else e.setAttribute(k,v);
+  }
+  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c));}
+  return e;
+}
+const norm=s=>String(s==null?'':s).replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[‌‏‎]/g,' ')
+  .replace(/^(دکتر|dr\.?)\s+/i,'').replace(/\s+/g,' ').trim().toLowerCase();
+const fa=new Intl.Collator('fa');
+const jalaliToday=()=>new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+const S={doctors:new Map(),pharmacies:new Map(),tab:'doctors',sel:null,W:null,dirty:false,q:'',limit:200,
+  db:null,sample:null,dl:null,ro:false,loaded:{doctors:false,pharmacies:false},slow:false,discard:false};
+const Q={run:0,max:4,q:[]};
+const lastW=new Map();
+function runJob(fn){return new Promise(res=>{Q.q.push({fn,res});pump();});}
+function pump(){
+  while(Q.run<Q.max&&Q.q.length){
+    const j=Q.q.shift();Q.run++;
+    (async()=>{
+      let ok=false;
+      for(let a=0;a<4&&!ok;a++){
+        try{await j.fn();ok=true;}
+        catch(e){const c=e&&e.code;if(c==='quota_exceeded'||c==='invalid_argument'||c==='revoked')break;if(c==='resource_exhausted')Q.max=Math.max(1,Q.max-1);await new Promise(r=>setTimeout(r,800*(a+1)));}
+      }
+      Q.run--;j.res(ok);pump();
+    })();
+  }
+}
+function docWrite(key,fn){
+  const prev=lastW.get(key)||Promise.resolve(true);
+  const p=prev.then(()=>runJob(fn));
+  lastW.set(key,p);
+  p.then(()=>{if(lastW.get(key)===p)lastW.delete(key);});
+  return p;
+}
+let rt;
+function sched(){clearTimeout(rt);rt=setTimeout(()=>{renderTop();renderList();renderNotices();if(!S.dirty)renderProfile();},200);}
+
+const FIELDS={
+  doctors:[['name','نام و نام خانوادگی','input','full'],['nezamCode','کد نظام پزشکی','input'],['specialty','تخصص','input'],
+    ['phone','شماره تلفن','input'],['address','آدرس مطب','area','full'],['workHours','روزها و ساعت کاری مطب','area','full'],
+    ['traits','ویژگی شخصیتی','area','full'],['lastVisit','خلاصه آخرین ویزیت (فیدبک)','area','full'],['lastVisitDate','تاریخ ثبت آخرین ویزیت','date']],
+  pharmacies:[['name','نام داروخانه','input','full'],['buyer','مسئول خرید','input'],['phone','شماره تلفن','input'],
+    ['address','آدرس','area','full'],['lastVisit','خلاصه آخرین ویزیت (فیدبک)','area','full'],['lastVisitDate','تاریخ ثبت آخرین ویزیت','date']]
+};
+const TITLE={doctors:'پزشکان',pharmacies:'داروخانه‌ها'};
+const REQ={doctors:['name','nezamCode','address'],pharmacies:['name']};
+const DIG={'۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9','٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+const normCode=s=>String(s==null?'':s).replace(/[۰-۹٠-٩]/g,d=>DIG[d]).replace(/[\s‌‏‎]+/g,'').replace(/[يى]/g,'ی').replace(/ك/g,'ک').toLowerCase();
+const codeOk=c=>/^[\p{L}\p{N}\-_\/]{2,20}$/u.test(c);
+function codeOwner(code,exceptId){
+  if(!code)return null;
+  for(const d of S.doctors.values())if(d.id!==exceptId&&normCode(d.nezamCode)===code)return d;
+  return null;
+}
+function validateDoctor(w,id){
+  const e={};
+  if(!(w.name||'').trim())e.name='نام را وارد کنید.';
+  const c=normCode(w.nezamCode);
+  if(!c)e.nezamCode='کد نظام پزشکی ضروری است.';
+  else if(!codeOk(c))e.nezamCode='کد نظام پزشکی معتبر نیست.';
+  else{const o=codeOwner(c,id);if(o)e.nezamCode='این کد برای «'+(o.name||'')+'» ثبت شده است.';}
+  if(!(w.address||'').trim())e.address='آدرس ضروری است.';
+  return e;
+}
+const ONE={doctors:'پزشک',pharmacies:'داروخانه'};
+
+/* ---------- toast ---------- */
+let tt;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},3600);}
+
+/* ---------- storage ---------- */
+function newId(col){return S.db?S.db.collection(col).doc().id:'l'+Math.random().toString(36).slice(2,10);}
+function persist(col,id,data,quiet){
+  const rec=Object.assign({},data);delete rec.id;
+  S[col].set(id,Object.assign({},rec,{id}));
+  if(!S.db)return Promise.resolve(true);
+  return docWrite(col+'/'+id,()=>S.db.collection(col).doc(id).set(rec)).then(ok=>{if(!ok&&!quiet)toast('ذخیره‌ی «'+(rec.name||'')+'» انجام نشد');return ok;});
+}
+function removeRec(col,id){
+  S[col].delete(id);
+  if(S.db)docWrite(col+'/'+id,()=>S.db.collection(col).doc(id).delete()).then(ok=>{if(!ok)toast('حذف انجام نشد');});
+}
+function subscribe(){
+  setTimeout(()=>{if(!S.loaded.doctors||!S.loaded.pharmacies){S.slow=true;renderNotices();}},10000);
+  for(const col of ['doctors','pharmacies']){
+    S.db.collection(col).onSnapshot(snap=>{
+      S[col]=new Map(snap.docs.map(d=>[d.id,Object.assign({},d.data(),{id:d.id})]));
+      if(!snap.metadata.fromCache||snap.size>0)S.loaded[col]=true;
+      if(S.loaded.doctors&&S.loaded.pharmacies)S.slow=false;
+      sched();checkSeed();
+    },()=>{S.slow=true;renderNotices();});
+  }
+}
+
+/* ---------- navigation ---------- */
+function go(fn){
+  if(S.dirty&&!S.discard){S.discard=true;toast('تغییرات ذخیره‌نشده دارید. برای رها کردن، دوباره بزنید.');setTimeout(()=>{S.discard=false},4000);return;}
+  S.discard=false;fn();
+}
+function seedW(){
+  const {col,id}=S.sel;const rec=S[col].get(id);if(!rec){S.W=null;return;}
+  S.W=clone(rec);
+  if(col==='pharmacies')S.W.doctorIds=[...S.doctors.values()].filter(d=>(d.pharmacyIds||[]).includes(id)).map(d=>d.id);
+}
+function openRec(col,id){go(()=>{S.tab=col;S.sel={col,id};S.dirty=false;dateTouched=false;seedW();render();window.scrollTo(0,0);});}
+function closeProfile(){go(()=>{S.sel=null;S.W=null;S.dirty=false;render();});}
+function addBlank(){
+  go(()=>{const col=S.tab,id=newId(col);
+    S.W=col==='doctors'?{name:'',nezamCode:'',specialty:'',phone:'',address:'',workHours:'',traits:'',lastVisitDate:'',lastVisit:'',pharmacyIds:[],status:'manual'}
+      :{name:'',buyer:'',phone:'',address:'',lastVisitDate:'',lastVisit:'',doctorIds:[]};
+    S.sel={col,id,isNew:true};S.dirty=true;dateTouched=false;render();});
+}
+
+/* ---------- render: top ---------- */
+function renderTop(){
+  const tabs=$('#tabs');tabs.replaceChildren();
+  for(const col of ['doctors','pharmacies']){
+    tabs.append(h('button',{class:'tab',role:'tab','aria-selected':String(S.tab===col),
+      onclick:()=>{if(S.tab!==col)go(()=>{S.tab=col;S.sel=null;S.W=null;S.dirty=false;S.q='';S.limit=200;$('#q').value='';render();});}},
+      TITLE[col],h('small',{text:String(S[col].size)})));
+  }
+  const a=$('#actions');a.replaceChildren();
+  if(!S.ro){
+    a.append(h('button',{class:'btn primary',onclick:openSheet},'+ افزودن'));
+    a.append(h('button',{class:'btn',onclick:openSheet},'ورود از فایل'));
+  }
+  const dlOk=!!S.dl;
+  a.append(h('button',{class:'btn',disabled:!dlOk,title:dlOk?'':'ذخیره‌ی فایل در این نمایش در دسترس نیست',onclick:exportXlsx},'خروجی اکسل'));
+  a.append(h('button',{class:'btn',disabled:!dlOk,onclick:exportCsv},'CSV'));
+  if(window.NOVA_FEEDBACK)a.append(h('a',{class:'btn',href:window.NOVA_FEEDBACK,target:'_blank',rel:'noopener'},'بازخورد'));
+}
+function renderNotices(){
+  const n=$('#notices');n.replaceChildren();
+  if(window.__NOVA_MEM)n.append(h('div',{class:'notice',text:'ذخیره‌سازی ماندگار در این مرورگر فعال نیست. داده‌ها فقط تا بستن صفحه می‌مانند؛ از آرشیو خروجی اکسل بگیرید.'}));
+  if(!S.db&&S.dbChecked)n.append(h('div',{class:'notice',text:'ذخیره‌سازی دائمی در این نمایش فعال نیست. تغییرات فقط تا بستن صفحه می‌مانند.'}));
+  else if(S.slow)n.append(h('div',{class:'notice',text:'اتصال به آرشیو برقرار نشد. داده‌های نمایش‌داده‌شده ممکن است قدیمی باشند.'}));
+  if(S.ro)n.append(h('div',{class:'notice',text:'دسترسی شما فقط برای مشاهده است.'}));
+  if(S.seeding)n.append(h('div',{class:'notice ok',text:'در حال ساخت آرشیو اولیه‌ی تهران: '+S.seedDone+' از '+S.seedTotal+'. صفحه را تا پایان باز نگه دارید.'}));
+  else if(S.seedOffer&&!S.ro&&S.db)n.append(h('div',{class:'notice ok'},'آرشیو اولیه‌ی تهران ('+MASTER.length+' پزشک) هنوز کامل وارد نشده است.',
+    h('button',{class:'btn small',onclick:()=>{S.seedOffer=false;seedMaster();}},'افزودن موارد جاافتاده')));
+}
+
+/* ---------- render: list ---------- */
+function matches(r,q){if(!q)return true;const t=norm(q);return Object.values(r).some(v=>typeof v==='string'&&norm(v).includes(t));}
+function renderList(){
+  const col=S.tab,all=[...S[col].values()].sort((a,b)=>fa.compare(a.name||'',b.name||''));
+  const rows=all.filter(r=>matches(r,S.q));
+  $('#count').textContent=(S.db&&!(S.loaded.doctors&&S.loaded.pharmacies))?'در حال بارگذاری…':
+    (S.q?rows.length+' از '+all.length:all.length)+' '+ONE[col];
+  const list=$('#list');list.replaceChildren();
+  if(!all.length&&(S.loaded[col]||!S.db)){
+    list.append(h('div',{class:'empty'},h('div',{},h('b',{text:col==='doctors'?'هنوز پزشکی در آرشیو نیست':'هنوز داروخانه‌ای در آرشیو نیست'}),h('br'),
+      col==='doctors'?'نام‌ها را وارد کنید یا فایل اکسل بدهید تا پروفایل ساخته شود.':'نام‌ها را وارد کنید یا فایل اکسل بدهید.'),
+      S.ro?null:h('button',{class:'btn primary',onclick:openSheet},'افزودن '+ONE[col])));
+    return;
+  }
+  for(const r of rows.slice(0,S.limit)){
+    let sub;
+    if(col==='doctors')sub=[r.specialty,r.nezamCode&&('کد '+r.nezamCode)].filter(Boolean).join(' · ');
+    else{const n=[...S.doctors.values()].filter(d=>(d.pharmacyIds||[]).includes(r.id)).length;sub=[r.buyer,n?n+' پزشک':''].filter(Boolean).join(' · ');}
+    list.append(h('button',{class:'item','aria-current':String(!!S.sel&&S.sel.id===r.id),onclick:()=>openRec(col,r.id)},
+      h('div',{class:'nm'},h('span',{text:r.name||'بدون نام'}),(col==='doctors'&&!(r.address||'').trim())?h('span',{class:'dot',title:'آدرس ندارد'}):(r.status==='ai'?h('span',{class:'dot',title:'اطلاعات تأییدنشده'}):null)),
+      h('div',{class:'sub',text:sub||'—'})));
+  }
+  if(!rows.length)list.append(h('div',{class:'ph',text:'موردی پیدا نشد.'}));
+  else if(rows.length>S.limit)list.append(h('button',{class:'btn',style:'margin-top:12px',onclick:()=>{S.limit+=400;renderList();}},'نمایش بیشتر ('+(rows.length-S.limit)+' مورد دیگر)'));
+}
+
+/* ---------- render: profile ---------- */
+function markDirty(){S.dirty=true;const b=$('#saveBtn');if(b)b.disabled=false;}
+let dateTouched=false;
+function setErr(key,msg){
+  const e=document.getElementById('e-'+key);if(e){e.textContent=msg||'';e.hidden=!msg;}
+  const i=document.getElementById('f-'+key);if(i)i.classList.toggle('bad',!!msg);
+}
+function fieldEl(key,label,kind,full){
+  const id='f-'+key,col=S.sel.col,req=(REQ[col]||[]).includes(key);
+  const inp=kind==='area'?h('textarea',{id,rows:3,dir:'auto'}):h('input',{id,type:'text',dir:'auto',autocomplete:'off',inputmode:key==='phone'?'tel':null});
+  inp.value=S.W[key]||'';inp.disabled=S.ro;
+  inp.addEventListener('input',()=>{
+    S.W[key]=inp.value;markDirty();
+    if(col==='doctors'&&key==='nezamCode'){const c=normCode(inp.value),o=c&&codeOwner(c,S.sel.id);setErr(key,o?'این کد برای «'+(o.name||'')+'» ثبت شده است.':'');}
+    else if(req&&inp.value.trim())setErr(key,'');
+    if(key==='lastVisit'&&!dateTouched){const d=inp.value.trim()?jalaliToday():'';S.W.lastVisitDate=d;const di=document.getElementById('f-lastVisitDate');if(di)di.value=d;}
+    if(key==='lastVisitDate')dateTouched=true;
+  });
+  let ctl=inp;
+  if(kind==='date'&&!S.ro)ctl=h('div',{class:'inline'},inp,h('button',{class:'btn small',type:'button',onclick:()=>{inp.value=jalaliToday();S.W[key]=inp.value;dateTouched=true;markDirty();}},'امروز'));
+  return h('div',{class:'f'+(full?' full':'')},h('label',{for:id,text:label+(req?' *':'')}),ctl,h('div',{class:'err',id:'e-'+key,hidden:true}));
+}
+function linkPicker(label,srcMap,key,openCol){
+  const box=h('div',{class:'f full'});
+  const draw=()=>{
+    box.replaceChildren(h('span',{class:'lbl',text:label}));
+    const ids=S.W[key]||[];
+    const chips=h('div',{class:'chips'});
+    for(const id of ids){const r=srcMap.get(id);if(!r)continue;
+      chips.append(h('span',{class:'chip'},h('button',{type:'button',onclick:()=>openRec(openCol,id)},r.name),
+        S.ro?null:h('button',{type:'button',class:'x','aria-label':'حذف پیوند',onclick:()=>{S.W[key]=ids.filter(x=>x!==id);markDirty();draw();}},'×')));}
+    if(chips.childNodes.length)box.append(chips);
+    const rest=[...srcMap.values()].filter(r=>!ids.includes(r.id)).sort((a,b)=>fa.compare(a.name||'',b.name||''));
+    if(!S.ro&&rest.length){
+      const sel=h('select',{'aria-label':label},h('option',{value:'',text:'افزودن…'}),rest.map(r=>h('option',{value:r.id,text:r.name})));
+      sel.addEventListener('change',()=>{if(sel.value){S.W[key]=[...ids,sel.value];markDirty();draw();}});
+      box.append(sel);
+    }else if(!ids.length)box.append(h('div',{class:'hint',text:'موردی برای پیوند وجود ندارد.'}));
+  };
+  draw();return box;
+}
+function renderProfile(){
+  const p=$('#profile'),main=$('#main');p.replaceChildren();
+  if(S.sel&&!S.sel.isNew&&!S.dirty)seedW();
+  if(!S.sel||!S.W){main.classList.remove('open');p.append(h('div',{class:'ph',text:'یک مورد را از فهرست انتخاب کنید.'}));return;}
+  main.classList.add('open');
+  const col=S.sel.col;
+  p.append(h('div',{class:'pbar'},
+    h('button',{class:'btn small back',onclick:closeProfile,'aria-label':'بازگشت'},'‹ فهرست'),
+    h('h2',{text:S.W.name||('+ '+ONE[col]+' جدید')}),
+    col==='doctors'&&S.W.status==='verified'?h('span',{class:'badge',text:'تأییدشده'}):null));
+  if(col==='doctors'&&S.W.status==='ai'){
+    p.append(h('div',{class:'banner'},h('div',{},'بخشی از این اطلاعات پیشنهاد هوش مصنوعی است و تأیید نشده. کد نظام پزشکی را در سایت رسمی ',
+      h('a',{href:'https://www.irimc.org',target:'_blank',rel:'noopener',text:'نظام پزشکی'}),' تطبیق دهید.'),
+      S.ro?null:h('button',{class:'btn small',onclick:()=>{S.W.status='verified';markDirty();renderProfile();}},'تطبیق دادم')));
+  }
+  const form=h('div',{class:'form'});
+  for(const [k,l,kind,full] of FIELDS[col])form.append(fieldEl(k,l,kind,full));
+  if(col==='doctors')form.append(linkPicker('داروخانه‌های مرتبط',S.pharmacies,'pharmacyIds','pharmacies'));
+  else form.append(linkPicker('پزشکان مرتبط',S.doctors,'doctorIds','doctors'));
+  p.append(form);
+  if(!S.ro){
+    const foot=h('div',{class:'foot'});
+    foot.append(h('button',{id:'saveBtn',class:'btn primary',disabled:!S.dirty,onclick:saveProfile},'ذخیره'));
+    if(col==='doctors'&&S.sample)foot.append(h('button',{class:'btn',onclick:fillOnline,id:'fillBtn'},'تکمیل با جستجو'));
+    if(!S.sel.isNew){
+      const del=h('button',{class:'btn danger sp'},'حذف');
+      let armed=false;
+      del.addEventListener('click',()=>{
+        if(!armed){armed=true;del.textContent='تأیید حذف؟';setTimeout(()=>{armed=false;del.textContent='حذف';},4000);return;}
+        deleteCurrent();
+      });
+      foot.append(del);
+    }
+    p.append(foot);
+  }
+}
+function saveProfile(){
+  const col=S.sel.col,id=S.sel.id;
+  if(!(S.W.name||'').trim()){toast('نام را وارد کنید');return;}
+  if(col==='doctors'){
+    const errs=validateDoctor(S.W,id),keys=['name','nezamCode','address'];
+    for(const k of keys)setErr(k,errs[k]);
+    const first=keys.find(k=>errs[k]);
+    if(first){toast(errs[first]);const el=document.getElementById('f-'+first);if(el)el.focus();return;}
+    S.W.nezamCode=normCode(S.W.nezamCode);
+  }
+  const now=Date.now(),W=clone(S.W);
+  const prev=S[col].get(id)||{};
+  if((W.lastVisit||'')!==(prev.lastVisit||''))W.lastVisitAt=now;
+  if(col==='doctors'){
+    W.updatedAt=now;if(!W.createdAt)W.createdAt=now;persist('doctors',id,W);
+  }else{
+    const ids=W.doctorIds||[];delete W.doctorIds;W.updatedAt=now;if(!W.createdAt)W.createdAt=now;persist('pharmacies',id,W);
+    for(const d of [...S.doctors.values()]){
+      const has=(d.pharmacyIds||[]).includes(id),want=ids.includes(d.id);
+      if(has!==want){
+        const nx=want?[...(d.pharmacyIds||[]),id]:(d.pharmacyIds||[]).filter(x=>x!==id);
+        persist('doctors',d.id,Object.assign({},d,{pharmacyIds:nx,updatedAt:now}));
+      }
+    }
+  }
+  S.sel.isNew=false;S.dirty=false;dateTouched=false;seedW();render();toast('ذخیره شد');
+}
+function deleteCurrent(){
+  const {col,id}=S.sel;
+  if(col==='pharmacies'){
+    for(const d of [...S.doctors.values()])if((d.pharmacyIds||[]).includes(id))
+      persist('doctors',d.id,Object.assign({},d,{pharmacyIds:d.pharmacyIds.filter(x=>x!==id),updatedAt:Date.now()}));
+  }
+  removeRec(col,id);S.sel=null;S.W=null;S.dirty=false;render();toast('حذف شد');
+}
+
+/* ---------- online lookup (AI-assisted, unverified) ---------- */
+function lookupPrompt(names){
+  return 'You help a pharmaceutical sales representative in Iran keep an archive of physicians. For each physician name below, report only what you reliably know from general knowledge. You cannot browse the web. NEVER invent or guess a medical council number (کد نظام پزشکی), phone number or street address: use an empty string whenever you are not sure. Names are often shared by many people, so use confidence "none" if you cannot tell who is meant. Write specialty in Persian. workHours is the typical clinic days/hours, only if known.\n\n'
+   +'Reply with only a JSON array, same order and same length as the input, of objects like {"name": string (exactly as given), "nezamCode": string, "specialty": string, "address": string, "workHours": string, "confidence": "high"|"low"|"none"}.\n\nNames:\n'
+   +names.map((n,i)=>(i+1)+'. '+n).join('\n');
+}
+function cleanFound(r){
+  const o={nezamCode:'',specialty:'',address:'',workHours:'',confidence:'none'};
+  if(!r||typeof r!=='object')return o;
+  for(const k of ['nezamCode','specialty','address','workHours'])if(typeof r[k]==='string'||typeof r[k]==='number')o[k]=String(r[k]).trim();
+  if(['high','low','none'].includes(r.confidence))o.confidence=r.confidence;
+  if(o.confidence==='none')return Object.assign(o,{nezamCode:'',address:'',workHours:''});
+  return o;
+}
+function sampleMsg(e){
+  const c=e&&e.code;
+  if(c==='not_granted')return 'اجازه‌ی استفاده از Claude داده نشد.';
+  if(c==='rate_limited')return 'تعداد درخواست‌ها زیاد است. کمی بعد دوباره تلاش کنید.';
+  if(c==='invalid_json')return 'پاسخ قابل خواندن نبود. دوباره تلاش کنید.';
+  if(c==='cancelled')return '';
+  return 'جستجو انجام نشد. دوباره تلاش کنید.';
+}
+async function lookupNames(names){
+  const res=await S.sample.json(lookupPrompt(names),{modelTier:'default'});
+  const arr=Array.isArray(res)?res:[];
+  return names.map((n,i)=>{
+    const byIdx=arr[i]&&norm(arr[i].name)===norm(n)?arr[i]:null;
+    const byName=arr.find(x=>x&&norm(x.name)===norm(n));
+    return cleanFound(byIdx||byName||null);
+  });
+}
+async function fillOnline(){
+  const btn=$('#fillBtn');if(!S.W.name.trim()){toast('ابتدا نام را وارد کنید');return;}
+  btn.disabled=true;btn.textContent='در حال جستجو…';
+  try{
+    const [f]=await lookupNames([S.W.name]);let used=false;
+    for(const k of ['nezamCode','specialty','address','workHours'])if(!(S.W[k]||'').trim()&&f[k]){S.W[k]=f[k];used=true;}
+    if(used){S.W.status='ai';markDirty();renderProfile();toast('فیلدهای خالی پیشنهاد شد؛ لطفاً بررسی کنید');}
+    else{btn.disabled=false;btn.textContent='تکمیل با جستجو';toast('اطلاعات قابل اتکایی پیدا نشد');}
+  }catch(e){btn.disabled=false;btn.textContent='تکمیل با جستجو';const m=sampleMsg(e);if(m)toast(m);}
+}
+
+/* ---------- add sheet / import ---------- */
+const A={kind:'doctors',names:'',items:[],busy:false,msg:'',err:''};
+const RULES={
+  doctors:[['status',/وضعیت|status/],['skip',/zone|منطقه|province|استان|city|شهر|header|detail/],
+    ['nezamCode',/نظام|nezam|council|کد|code/],['specialty',/تخصص|special/],['address',/آدرس|نشانی|address/],
+    ['workHours',/ساعت|روز|hours|day/],['traits',/ویژگی|شخصیت|trait/],['skip',/داروخانه|pharm/],['phone',/تلفن|موبایل|phone|tel|mobile/],
+    ['lastVisitDate',/تاریخ|date/],['lastVisit',/ویزیت|خلاصه|visit/],['name',/نام|اسم|پزشک|دکتر|name|doctor|physician/]],
+  pharmacies:[['skip',/zone|منطقه|province|استان|city|شهر|header|detail/],['buyer',/مسئول|خرید|buyer/],['address',/آدرس|نشانی|address/],
+    ['phone',/تلفن|موبایل|phone|tel|mobile/],['lastVisitDate',/تاریخ|date/],['lastVisit',/ویزیت|خلاصه|visit/],
+    ['skip',/پزشک|doctor/],['name',/نام|اسم|داروخانه|name|pharm/]]
+};
+function parseCSV(t){
+  const rows=[];let r=[],c='',q=false;t=t.replace(/^﻿/,'');
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++;}else q=false;}else c+=ch;}
+    else if(ch==='"')q=true;
+    else if(ch===','||ch==='؛'||ch===';'||ch==='\t'){r.push(c);c='';}
+    else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';rows.push(r);r=[];}
+    else c+=ch;}
+  if(c||r.length){r.push(c);rows.push(r);}
+  return rows;
+}
+function detect(rows,kind){
+  const map={};
+  if(!rows.length)return map;
+  rows[0].forEach((hd,i)=>{const t=norm(hd);for(const [k,re] of RULES[kind])if(re.test(t)){if(k!=='skip'&&k!=='status'&&!(k in map))map[k]=i;break;}});
+  return map;
+}
+function looksHeader(rows,kind){const m=detect(rows,kind);const n=Object.keys(m).length;return n>0&&('name' in m||n>1);}
+function remap(){
+  A.map=A.hasHeader?detect(A.raw,A.kind):{};
+  if(!('name' in A.map))A.map.name=0;
+  applyMap();
+}
+function setRaw(rows){
+  rows=rows.filter(r=>r.some(c=>String(c==null?'':c).trim()));
+  A.raw=rows;
+  if(!rows.length){A.items=A.items.filter(i=>!i.fromFile);A.err='فایل خالی است.';return;}
+  A.hasHeader=looksHeader(rows,A.kind);
+  remap();
+}
+function applyMap(){
+  A.items=A.items.filter(i=>!i.fromFile);
+  if(!('name' in A.map)){A.err='ستون نام انتخاب نشده است.';return;}
+  const have=new Set(A.items.map(i=>norm(i.name)));
+  const cell=(r,i)=>String(r[i]==null?'':r[i]).trim();
+  let add=0;
+  for(const r of A.raw.slice(A.hasHeader?1:0)){
+    const name=cell(r,A.map.name);if(!name)continue;
+    const k=norm(name);if(have.has(k))continue;have.add(k);
+    const known={};
+    for(const [f,ci] of Object.entries(A.map)){if(f==='name')continue;const v=cell(r,ci);if(v)known[f]=v;}
+    A.items.push({name,known,found:null,include:true,fromFile:true});add++;
+  }
+  A.err=add?'':'نامی در ستون انتخاب‌شده پیدا نشد.';
+}
+function mapUI(){
+  const wrap=h('div',{class:'mapbox'});
+  const hdr=A.raw[0]||[];
+  const cols=Math.max(hdr.length,...A.raw.slice(0,30).map(r=>r.length));
+  const label=i=>(A.hasHeader&&String(hdr[i]==null?'':hdr[i]).trim())?String(hdr[i]).trim():'ستون '+(i+1);
+  const cb=h('input',{type:'checkbox',id:'hasHdr'});cb.checked=A.hasHeader;
+  cb.addEventListener('change',()=>{A.hasHeader=cb.checked;remap();renderSheet();});
+  wrap.append(h('div',{class:'hint',text:'ستون‌ها را کنترل کنید. هر فیلد از ستونی که انتخاب کنید خوانده می‌شود.'}),
+    h('label',{class:'hint inl','for':'hasHdr'},cb,'سطر اول، عنوان ستون‌هاست'));
+  const grid=h('div',{class:'maprid'});
+  for(const [k,l] of FIELDS[A.kind]){
+    const sel=h('select',{'aria-label':l},h('option',{value:'',text:'— نادیده گرفتن —'}));
+    for(let i=0;i<cols;i++)sel.append(h('option',{value:String(i),text:label(i)}));
+    sel.value=A.map[k]==null?'':String(A.map[k]);
+    sel.addEventListener('change',()=>{if(sel.value==='')delete A.map[k];else A.map[k]=Number(sel.value);applyMap();renderSheet();});
+    grid.append(h('div',{class:'f'},h('span',{class:'lbl',text:l+(k==='name'?' *':'')}),sel));
+  }
+  wrap.append(grid);
+  return wrap;
+}
+async function readFile(file){
+  const buf=await file.arrayBuffer();
+  if(/\.(csv|tsv|txt)$/i.test(file.name)){
+    let text;
+    try{text=new TextDecoder('utf-8',{fatal:true}).decode(buf);}catch(e){text=new TextDecoder('windows-1256').decode(buf);}
+    return parseCSV(text);
+  }
+  if(/\.xls$/i.test(file.name))throw new Error('xls');
+  return await XL.read(buf);
+}
+let EX=null;
+function exset(){const m=S[A.kind];if(!EX||EX.kind!==A.kind||EX.n!==m.size)EX={kind:A.kind,n:m.size,set:new Set([...m.values()].map(r=>norm(r.name)))};return EX.set;}
+const existing=name=>exset().has(norm(name));
+function collect(){
+  if(A.names.includes('\t')){
+    const rows=A.names.split(/\r?\n/).map(l=>l.split('\t'));
+    A.names='';setRaw(rows);return;
+  }
+  const names=A.names.split(/[\n,،;؛]+/).map(s=>s.trim()).filter(Boolean);
+  const have=new Set(A.items.map(i=>norm(i.name)));
+  for(const n of names)if(!have.has(norm(n))){have.add(norm(n));A.items.push({name:n,known:{},found:null,include:true});}
+  A.names='';
+}
+function mergeItem(it){
+  const data=Object.assign({},it.known);let used=false;
+  for(const k of ['nezamCode','specialty','address','workHours'])if(!data[k]&&it.found&&it.found[k]){data[k]=it.found[k];used=true;}
+  if(data.nezamCode)data.nezamCode=normCode(data.nezamCode);
+  return {data,used};
+}
+function openSheet(){
+  if(S.ro)return;
+  A.kind=S.tab;A.names='';A.items=[];A.busy=false;A.looking=false;A.msg='';A.err='';A.raw=null;A.map={};A.hasHeader=false;
+  $('#sheet').hidden=false;renderSheet();
+}
+function closeSheet(){$('#sheet').hidden=true;}
+async function runLookup(){
+  collect();
+  const todo=A.items.filter(i=>!i.found&&!existing(i.name));
+  if(!todo.length){A.err='نامی برای جستجو وجود ندارد.';renderSheet();return;}
+  A.busy=true;A.looking=true;A.err='';renderSheet();
+  try{
+    for(let i=0;i<todo.length;i+=8){
+      const part=todo.slice(i,i+8);
+      A.msg='در حال جستجو… '+Math.min(i+8,todo.length)+' از '+todo.length;renderSheet();
+      const found=await lookupNames(part.map(x=>x.name));
+      part.forEach((it,k)=>{it.found=found[k];});
+    }
+  }catch(e){A.err=sampleMsg(e);}
+  A.busy=false;A.looking=false;A.msg='';renderSheet();
+}
+function evaluate(){
+  const doc=A.kind==='doctors',codes=new Map(),names=exset();
+  if(doc)for(const d of S.doctors.values()){const c=normCode(d.nezamCode);if(c)codes.set(c,d.name);}
+  for(const it of A.items){
+    const m=mergeItem(it);it.data=m.data;it.used=m.used;it.problem='';it.dup=false;
+    if(names.has(norm(it.name))){it.problem='قبلاً در آرشیو';it.dup=true;continue;}
+    if(!doc)continue;
+    const c=normCode(it.data.nezamCode);
+    if(!c)it.problem='بدون کد نظام پزشکی';
+    else if(!codeOk(c))it.problem='کد نظام معتبر نیست';
+    else if(codes.has(c))it.problem='کد تکراری ('+codes.get(c)+')';
+    else if(!(it.data.address||'').trim())it.problem='بدون آدرس';
+    if(c&&!it.problem)codes.set(c,it.name);
+  }
+}
+async function saveItems(){
+  collect();evaluate();
+  const doc=A.kind==='doctors',now=Date.now(),jobs=[];
+  for(const it of A.items){
+    it.saved=false;
+    if(!it.include||it.problem)continue;
+    const id=newId(A.kind);
+    const rec=doc?Object.assign({name:it.name,nezamCode:'',specialty:'',phone:'',address:'',workHours:'',traits:'',lastVisitDate:'',lastVisit:'',pharmacyIds:[],status:it.used?'ai':'manual',createdAt:now,updatedAt:now},it.data)
+      :Object.assign({name:it.name,buyer:'',phone:'',address:'',lastVisitDate:'',lastVisit:'',createdAt:now,updatedAt:now},it.data);
+    jobs.push([it,id,rec]);
+  }
+  const held=A.items.filter(i=>i.problem&&!i.dup).length;
+  if(!jobs.length){A.err=held?held+' مورد ناقص یا تکراری است. کد نظام و آدرس را کامل کنید.':'مورد جدیدی برای ذخیره نبود.';renderSheet();return;}
+  A.busy=true;A.err='';renderSheet();
+  let done=0,bad=0;
+  await Promise.all(jobs.map(([it,id,rec])=>persist(A.kind,id,rec,true).then(ok=>{
+    it.saved=ok;done++;if(!ok)bad++;
+    if(done%10===0||done===jobs.length){const b=$('#btnSave');if(b)b.textContent='در حال ذخیره… '+done+' از '+jobs.length;}
+  })));
+  A.items=A.items.filter(i=>!i.saved);A.busy=false;
+  renderTop();renderList();
+  const left=A.items.filter(i=>!i.dup).length;
+  if(!A.items.length)closeSheet();else{if(left)A.err=left+' مورد ذخیره نشد چون کد نظام یا آدرس ناقص یا تکراری است.';renderSheet();}
+  toast(bad?(jobs.length-bad)+' پروفایل ساخته شد، '+bad+' مورد ذخیره نشد':(jobs.length)+' پروفایل ساخته شد');
+}
+function renderSheet(){
+  const box=$('#sheet .sheetbox');box.replaceChildren();
+  const doc=A.kind==='doctors';
+  box.append(h('div',{class:'shead'},h('h2',{text:'افزودن '+TITLE[A.kind]}),h('button',{class:'btn small',onclick:closeSheet},'بستن')));
+  const ta=h('textarea',{id:'names',rows:5,dir:'auto',placeholder:doc?'هر خط یک نام پزشک (یا با ویرگول جدا کنید)':'هر خط یک نام داروخانه',value:A.names});
+  ta.addEventListener('input',()=>{A.names=ta.value;});
+  box.append(h('div',{class:'f'},h('label',{for:'names',text:doc?'نام پزشکان':'نام داروخانه‌ها'}),ta));
+  if(doc)box.append(h('div',{class:'hint',text:'برای ثبت هر پزشک، کد نظام پزشکی و آدرس ضروری است و کد نظام نباید با پزشک دیگری یکی باشد.'}));
+  const fin=h('input',{id:'fileIn',type:'file',accept:'.xlsx,.csv,.tsv,.txt'});
+  fin.addEventListener('change',async()=>{
+    const f=fin.files&&fin.files[0];if(!f)return;
+    try{
+      const rows=await readFile(f);
+      collect();setRaw(rows);
+      if(!A.err)toast(A.items.filter(x=>x.fromFile).length+' نام از فایل خوانده شد');
+    }catch(e){
+      A.err=/\.xls$/i.test(f.name)?'فرمت قدیمی xls پشتیبانی نمی‌شود. فایل را به xlsx یا CSV تبدیل کنید.':'فایل خوانده نشد. فایل باید xlsx یا CSV باشد، یا جدول را از اکسل کپی و در کادر بالا پیست کنید.';
+    }
+    renderSheet();
+  });
+  box.append(h('div',{class:'row2'},h('label',{class:'btn filebtn'},'انتخاب فایل اکسل یا CSV',fin),
+    h('span',{class:'hint',text:'یا جدول را از اکسل کپی و در کادر بالا پیست کنید.'})));
+  if(A.raw&&A.raw.length)box.append(mapUI());
+  if(doc&&S.sample)box.append(h('div',{class:'hint'},'جستجو از دانش هوش مصنوعی استفاده می‌کند و به پایگاه رسمی وصل نیست؛ نتیجه‌ها پیش‌نویس‌اند. کد نظام پزشکی را در ',
+    h('a',{href:'https://www.irimc.org',target:'_blank',rel:'noopener',text:'سایت نظام پزشکی'}),' تطبیق دهید.'));
+  const btns=h('div',{class:'row2'});
+  if(doc&&S.sample)btns.append(h('button',{class:'btn primary',disabled:A.busy,onclick:runLookup},A.looking?(A.msg||'در حال جستجو…'):'جستجو و ساخت پیش‌نویس'));
+  btns.append(h('button',{id:'btnSave',class:'btn'+((doc&&S.sample)?'':' primary'),disabled:A.busy,onclick:saveItems},doc&&S.sample?'ذخیره بدون جستجو':'ذخیره'));
+  box.append(btns);
+  if(A.err)box.append(h('div',{class:'err',text:A.err}));
+  if(A.items.length){
+    evaluate();
+    const ready=A.items.filter(x=>x.include&&!x.problem).length,probs=A.items.filter(x=>x.problem&&!x.dup).length;
+    box.append(h('div',{class:'hint',text:ready+' مورد آماده‌ی ذخیره'+(probs?' · '+probs+' مورد ناقص یا تکراری (بالای فهرست)':'')+(A.items.length>60?' · ۶۰ مورد اول نمایش داده می‌شود':'')}));
+    const res=h('div',{class:'res'});
+    const view=[...A.items].sort((a,b)=>(!!b.problem&&!b.dup)-(!!a.problem&&!a.dup)).slice(0,60);
+    for(const it of view){
+      const bad=!!it.problem,d=it.data||{};
+      const cb=h('input',{type:'checkbox','aria-label':'انتخاب '+it.name,disabled:bad});
+      cb.checked=it.include&&!bad;cb.addEventListener('change',()=>{it.include=cb.checked;});
+      const detail=[d.specialty,d.nezamCode&&('کد '+d.nezamCode),d.address].filter(Boolean).join(' · ');
+      const badge=bad?[it.problem,true]:it.used?['پیشنهادی، تأییدنشده',true]:it.found?['بدون نتیجه',false]:Object.keys(it.known).length?['از فایل',false]:null;
+      const fix=[];
+      if(doc&&bad&&!it.dup){
+        const ci=h('input',{type:'text',dir:'auto',placeholder:'کد نظام پزشکی',value:it.known.nezamCode||d.nezamCode||'','aria-label':'کد نظام '+it.name});
+        ci.addEventListener('change',()=>{it.known.nezamCode=ci.value;renderSheet();});
+        const ai=h('input',{type:'text',dir:'auto',placeholder:'آدرس',value:it.known.address||d.address||'','aria-label':'آدرس '+it.name});
+        ai.addEventListener('change',()=>{it.known.address=ai.value;renderSheet();});
+        fix.push(h('div',{class:'fixrow'},ci,ai));
+      }
+      res.append(h('div',{class:'rit'},cb,h('div',{class:'b'},
+        h('div',{class:'nm'},h('span',{text:it.name}),badge?h('span',{class:'badge'+(badge[1]?' warn':''),text:badge[0]}):null),
+        detail?h('div',{class:'d',text:detail}):null,fix)));
+    }
+    box.append(res);
+  }
+}
+
+/* ---------- export ---------- */
+function doctorRows(){
+  const head=['نام','کد نظام پزشکی','تخصص','آدرس مطب','روزها و ساعت کاری','ویژگی شخصیتی','داروخانه‌ها','تلفن','تاریخ آخرین ویزیت','خلاصه آخرین ویزیت','وضعیت اطلاعات'];
+  const rows=[...S.doctors.values()].sort((a,b)=>fa.compare(a.name||'',b.name||'')).map(d=>[
+    d.name||'',d.nezamCode||'',d.specialty||'',d.address||'',d.workHours||'',d.traits||'',
+    (d.pharmacyIds||[]).map(id=>(S.pharmacies.get(id)||{}).name).filter(Boolean).join('، '),
+    d.phone||'',d.lastVisitDate||'',d.lastVisit||'',d.status==='ai'?'تأییدنشده':d.status==='verified'?'تأییدشده':'']);
+  return [head,...rows];
+}
+function pharmacyRows(){
+  const head=['نام داروخانه','مسئول خرید','آدرس','تلفن','پزشکان','تاریخ آخرین ویزیت','خلاصه آخرین ویزیت'];
+  const rows=[...S.pharmacies.values()].sort((a,b)=>fa.compare(a.name||'',b.name||'')).map(p=>[
+    p.name||'',p.buyer||'',p.address||'',p.phone||'',
+    [...S.doctors.values()].filter(d=>(d.pharmacyIds||[]).includes(p.id)).map(d=>d.name).join('، '),
+    p.lastVisitDate||'',p.lastVisit||'']);
+  return [head,...rows];
+}
+async function saveFile(filename,data){
+  if(!S.dl){toast('ذخیره‌ی فایل در این نمایش در دسترس نیست');return;}
+  try{await S.dl.save({filename,data});toast('فایل ذخیره شد');}
+  catch(e){if(!e||e.code!=='declined')toast('ذخیره‌ی فایل انجام نشد');}
+}
+function exportXlsx(){
+  saveFile('nova-archive.xlsx',XL.write([
+    {name:'پزشکان',rows:doctorRows(),widths:[22,16,16,34,28,28,28,16,16,34,14]},
+    {name:'داروخانه‌ها',rows:pharmacyRows(),widths:[24,18,34,16,36,16,34]}]));
+}
+function exportCsv(){
+  const rows=S.tab==='doctors'?doctorRows():pharmacyRows();
+  const csv='﻿'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  saveFile(S.tab==='doctors'?'nova-doctors.csv':'nova-pharmacies.csv',csv);
+}
+
+/* ---------- built-in master list (Tehran) and first-run seeding ---------- */
+const MASTER=[];
+async function seedMaster(){
+  if(S.seeding||S.ro||!S.db)return;
+  S.seeding=true;
+  const ex=new Set([...S.doctors.values()].map(r=>norm(r.name))),now=Date.now(),jobs=[];
+  const codes=new Set([...S.doctors.values()].map(r=>normCode(r.nezamCode)).filter(Boolean));
+  let skipped=0;
+  for(const [name,code,spec,addr] of MASTER){
+    const k=norm(name),c=normCode(code);
+    if(ex.has(k))continue;
+    if(!c||!codeOk(c)||!(addr||'').trim()||codes.has(c)){skipped++;continue;}
+    ex.add(k);codes.add(c);
+    jobs.push({name,nezamCode:c,specialty:spec,address:addr,phone:'',workHours:'',traits:'',lastVisitDate:'',lastVisit:'',pharmacyIds:[],status:'manual',createdAt:now,updatedAt:now});
+  }
+  S.seedTotal=jobs.length;S.seedDone=0;renderNotices();
+  let bad=0;
+  await Promise.all(jobs.map(rec=>persist('doctors',newId('doctors'),rec,true).then(ok=>{
+    S.seedDone++;if(!ok)bad++;if(S.seedDone%25===0)renderNotices();
+  })));
+  S.seeding=false;
+  if(!bad){try{await S.db.doc('meta/seed').set({done:true,count:MASTER.length,at:Date.now()});S.seedFlag=true;}catch(e){}}
+  else S.seedOffer=true;
+  renderTop();renderList();renderNotices();
+  toast(bad?(jobs.length-bad)+' پزشک ساخته شد، '+bad+' مورد ذخیره نشد. دوباره امتحان کنید.':(skipped?skipped+' مورد به‌علت نبود کد یا آدرس وارد نشد':'آرشیو اولیه‌ی تهران آماده شد'));
+}
+async function checkSeed(){
+  if(!MASTER.length||S.seedChecked||!S.db||!S.userChecked||S.ro||!S.loaded.doctors||!S.loaded.pharmacies)return;
+  S.seedChecked=true;
+  try{const f=await S.db.doc('meta/seed').get();S.seedFlag=f.exists;}catch(e){return;}
+  if(S.seedFlag)return;
+  if(S.doctors.size===0)seedMaster();
+  else{S.seedOffer=true;renderNotices();}
+}
+
+/* ---------- boot ---------- */
+function render(){renderTop();renderList();renderNotices();renderProfile();}
+$('#q').addEventListener('input',e=>{S.q=e.target.value;S.limit=200;renderList();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet();});
+render();
+const use=n=>(window.claude&&window.claude.use)?window.claude.use(n).catch(()=>null):Promise.resolve(null);
+use('db').then(db=>{S.db=db;S.dbChecked=true;if(db)subscribe();else{S.loaded.doctors=S.loaded.pharmacies=true;}render();});
+use('sample').then(s=>{S.sample=s;if(!S.dirty)renderProfile();});
+use('downloads').then(d=>{S.dl=d;renderTop();});
+use('user').then(async u=>{try{if(u&&u.can){const c=await u.can('data.write');if(c===false){S.ro=true;render();}}}catch(e){}S.userChecked=true;checkSeed();});
+</script>
+<script>if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});</script>
+</body></html>
