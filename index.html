@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA | نووآ - سامانه هوشمند مدیریت ویزیت</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f3f6fb;
+            --bg-card: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent: #1d63ed;
+            --accent-hover: #1550c7;
+            --accent-soft: #e8f0fe;
+            --accent-text: #1d63ed;
+            --ring-color: #1d63ed;
+        }
+
+        /* Dark Theme (تیره) */
+        [data-theme="dark"] {
+            --bg-main: #0b1120;
+            --bg-card: #131c31;
+            --bg-subtle: #1e293b;
+            --text-primary: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #26334d;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-soft: rgba(59, 130, 246, 0.16);
+            --accent-text: #93c5fd;
+            --ring-color: #3b82f6;
+        }
+
+        /* Blue / Deep Navy Theme (آبی) */
+        [data-theme="blue"] {
+            --bg-main: #0a192f;
+            --bg-card: #112240;
+            --bg-subtle: #1d3557;
+            --text-primary: #e6f1ff;
+            --text-muted: #8892b0;
+            --border-color: #233554;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --accent-soft: rgba(56, 189, 248, 0.16);
+            --accent-text: #7dd3fc;
+            --ring-color: #38bdf8;
+        }
+
+        /* Pink Theme (صورتی) */
+        [data-theme="pink"] {
+            --bg-main: #fdf2f8;
+            --bg-card: #ffffff;
+            --bg-subtle: #fce7f3;
+            --text-primary: #1f121b;
+            --text-muted: #705265;
+            --border-color: #fbcfe8;
+            --accent: #db2777;
+            --accent-hover: #be185d;
+            --accent-soft: #fce7f3;
+            --accent-text: #be185d;
+            --ring-color: #db2777;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            overflow-x: hidden;
+        }
+
+        .pv-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.06);
+            transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+        }
+
+        [data-theme="dark"] .pv-card,
+        [data-theme="blue"] .pv-card {
+            box-shadow: 0 10px 28px -8px rgba(0, 0, 0, 0.45);
+        }
+
+        .pv-subtle {
+            background-color: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+        }
+
+        .pv-muted {
+            color: var(--text-muted);
+        }
+
+        .pv-btn-primary {
+            background-color: var(--accent);
+            color: #ffffff;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        [data-theme="blue"] .pv-btn-primary {
+            color: #081226;
+        }
+
+        .pv-btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .pv-btn-primary:active {
+            transform: scale(0.985);
+        }
+
+        .pv-icon-tile {
+            background-color: var(--accent);
+            color: #ffffff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 14px -4px rgba(29, 99, 237, 0.35);
+        }
+
+        [data-theme="blue"] .pv-icon-tile {
+            color: #081226;
+        }
+
+        .pv-soft-badge {
+            background-color: var(--accent-soft);
+            color: var(--accent-text);
+        }
+
+        .pv-input {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .pv-input:focus {
+            outline: none;
+            border-color: var(--ring-color);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .nova-wordmark {
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            background: linear-gradient(135deg, #0f294a 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        [data-theme="dark"] .nova-wordmark,
+        [data-theme="blue"] .nova-wordmark {
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen select-none">
+
+    <!-- Toast Notification Banner -->
+    <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 opacity-0 pointer-events-none w-[92%] max-w-sm">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between gap-2 text-xs font-medium border border-slate-700">
+            <div class="flex items-center gap-2">
+                <span id="toastIcon" class="text-base">✨</span>
+                <span id="toastText">پیام سیستم</span>
+            </div>
+            <button onclick="hideToast()" class="text-slate-400 hover:text-white text-sm px-1 cursor-pointer">✕</button>
+        </div>
+    </div>
+
+    <!-- App Container (Mobile First) -->
+    <div id="appShell" class="max-w-md mx-auto min-h-screen relative flex flex-col">
+
+        <!-- ========================================================= -->
+        <!-- 1. LOGIN SCREEN (Matching PouyaVision Screenshot 1)       -->
+        <!-- ========================================================= -->
+        <section id="loginScreen" class="min-h-screen flex flex-col justify-between p-4 relative">
+            <!-- Top Bar: Cloud Connection Status (Right) + Theme Palette Button (Top-Left) -->
+            <div class="flex justify-between items-center pt-1">
+                <div class="pv-card px-3 py-2 text-[11px] font-bold flex items-center gap-1.5">
+                    <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="cloudStatusLabel">در حال اتصال به nova-archive01...</span>
+                </div>
+
+                <button onclick="openThemeSheet()" title="انتخاب تم" aria-label="انتخاب تم"
+                    class="w-12 h-12 pv-card rounded-2xl flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition">
+                    <svg class="w-6 h-6" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Main White Login Card -->
+            <div class="pv-card p-6 my-auto space-y-5">
+                <!-- Custom NOVA Typography Logo & Slogan -->
+                <div class="flex flex-col items-center text-center space-y-1">
+                    <div class="flex items-center justify-center gap-2" dir="ltr">
+                        <svg class="w-9 h-9" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="12" fill="var(--accent)" />
+                            <path d="M11 28V12L21 28V12" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M27 12L31 28L23 28L27 12Z" fill="#f59e0b" />
+                        </svg>
+                        <div class="flex flex-col items-center leading-none">
+                            <span class="text-3xl nova-wordmark">NOVA</span>
+                            <span class="text-[9px] font-extrabold tracking-[0.35em] pv-muted mt-0.5">ARCHIVE • نووآ</span>
+                        </div>
+                    </div>
+                    <h1 class="text-base font-extrabold pt-2" style="color: var(--accent);">
+                        نووآ؛ طراحی نو، تفکری برتر
+                    </h1>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3.5">
+                    <div>
+                        <input type="text" id="loginUsername" required placeholder="نام کاربری"
+                            class="w-full pv-input px-4 py-3.5 text-sm font-medium text-right" autocomplete="username">
+                    </div>
+
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required placeholder="رمز عبور"
+                            class="w-full pv-input pl-11 pr-4 py-3.5 text-sm font-medium text-right" autocomplete="current-password">
+                        <button type="button" onclick="togglePasswordVisibility()"
+                            class="absolute left-3.5 top-1/2 -translate-y-1/2 pv-muted hover:opacity-80 cursor-pointer" title="نمایش/مخفی کردن رمز">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div>
+                        <input type="text" id="loginCaptchaInput" required placeholder="عبارت امنیتی را وارد کنید"
+                            class="w-full pv-input px-4 py-3.5 text-sm font-medium text-right" maxlength="6">
+                    </div>
+
+                    <!-- Captcha Refresh + Struck-through Code Box -->
+                    <div class="flex items-center justify-center gap-3 pt-1" dir="ltr">
+                        <button type="button" onclick="refreshCaptcha()" title="تغییر کد امنیتی"
+                            class="w-11 h-11 pv-btn-primary rounded-xl flex items-center justify-center shadow-sm cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                        <div class="pv-subtle px-6 py-2.5 rounded-xl flex items-center justify-center min-w-[144px]">
+                            <span id="captchaDisplay" class="text-xl font-extrabold tracking-[0.28em] line-through decoration-2" style="color: var(--text-primary);">TSLU</span>
+                        </div>
+                    </div>
+
+                    <!-- Primary Login Button -->
+                    <button type="submit" class="w-full pv-btn-primary py-3.5 rounded-2xl font-bold text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer mt-2">
+                        <span>ورود</span>
+                        <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Quick Demo Fill Hint -->
+                <div class="pt-3 border-t flex items-center justify-between text-[11px]" style="border-color: var(--border-color);">
+                    <span class="pv-muted">پیش‌فرض مدیر: <b class="font-bold">admin</b> / <b class="font-bold">1234</b></span>
+                    <button type="button" onclick="quickFillDemoUser()" class="px-3 py-1.5 rounded-xl font-bold pv-soft-badge cursor-pointer">
+                        پر کردن سریع
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center text-[11px] pv-muted pb-2">
+                متصل به فضای ابری Firebase • پروژه nova-archive01
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- 2. AUTHENTICATED MAIN APP SHELL                           -->
+        <!-- ========================================================= -->
+        <section id="mainAppScreen" class="hidden min-h-screen flex-col pb-28">
+
+            <!-- Top Header (Matching PouyaVision Screenshot 2 & 4) -->
+            <header class="px-4 pt-4 pb-3 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md" style="background-color: color-mix(in srgb, var(--bg-main) 88%, transparent);">
+                <!-- Right Side (in RTL): Avatar + Time Greeting + Full Name -->
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full p-0.5 flex items-center justify-center font-extrabold text-base text-white shadow-sm shrink-0"
+                        style="background: linear-gradient(135deg, var(--accent), #0ea5e9);" id="headerUserAvatar">
+                        ح
+                    </div>
+                    <div class="text-right">
+                        <div id="headerGreeting" class="text-xs font-medium flex items-center gap-1 pv-muted">
+                            <span>شب بخیر</span>
+                            <span>🌙</span>
+                        </div>
+                        <div id="headerUserName" class="text-sm font-extrabold">حسین علی‌شیری</div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="headerCloudBadge" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full pv-soft-badge">
+                                <span id="headerCloudDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span id="headerCloudText">Online • ابری</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Left Side (in RTL): Theme Palette & Logout Buttons -->
+                <div class="flex items-center gap-2">
+                    <button onclick="openThemeSheet()" title="انتخاب تم" aria-label="انتخاب تم"
+                        class="w-11 h-11 pv-card rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-85 transition">
+                        <svg class="w-5 h-5" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                    </button>
+
+                    <button onclick="handleLogout()" title="خروج از حساب" aria-label="خروج از حساب"
+                        class="w-11 h-11 pv-card rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-85 transition">
+                        <svg class="w-5 h-5" style="color: var(--text-primary);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ========================================================= -->
+            <!-- TAB 1: HOME DASHBOARD (Matching Screenshot 2)             -->
+            <!-- ========================================================= -->
+            <div id="tabHome" class="px-4 space-y-4">
+                <!-- Daily Program Summary Card -->
+                <div class="pv-card p-4 space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <h2 id="homeDateHeading" class="text-sm font-extrabold">برنامه امروز ۳۰ آبان</h2>
+                        <span id="homeProgressBadge" class="text-[11px] font-bold px-3 py-1 rounded-full pv-soft-badge">
+                            ۰ از ۷ انجام شد
+                        </span>
+                    </div>
+
+                    <!-- 3 Stat Boxes: ویزیت امروز / انجام شده / در انتظار تکمیل -->
+                    <div class="grid grid-cols-3 gap-2.5 text-center">
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statTotalVisits" class="text-lg font-extrabold">۷</div>
+                            <div class="text-[11px] pv-muted mt-0.5">ویزیت امروز</div>
+                        </div>
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statCompletedVisits" class="text-lg font-extrabold">۰</div>
+                            <div class="text-[11px] pv-muted mt-0.5">انجام شده</div>
+                        </div>
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statPendingVisits" class="text-lg font-extrabold">۰</div>
+                            <div class="text-[11px] pv-muted mt-0.5 leading-tight">در انتظار تکمیل</div>
+                        </div>
+                    </div>
+
+                    <!-- Blue Progress Bar -->
+                    <div class="w-full h-2 rounded-full overflow-hidden" style="background-color: var(--bg-subtle);">
+                        <div id="homeProgressBar" class="h-full rounded-full transition-all duration-300" style="width: 0%; background-color: var(--accent);"></div>
+                    </div>
+                </div>
+
+                <!-- Golden Bonus / Monthly Target Card -->
+                <div class="pv-card p-4">
+                    <button onclick="toggleBonusAccordion()" class="w-full flex items-center justify-between text-right cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="pv-icon-tile w-11 h-11 shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-extrabold">طرح پاداش طلایی نووآ</div>
+                                <div id="bonusRemainingText" class="text-[11px] font-bold mt-0.5" style="color: var(--accent);">
+                                    فقط ۷۶ ویزیت تا جایزه‌ی ۱۰ میلیونی
+                                </div>
+                            </div>
+                        </div>
+                        <svg id="bonusChevron" class="w-5 h-5 pv-muted transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div id="bonusAccordionBody" class="hidden mt-3 pt-3 border-t text-xs space-y-1.5 pv-muted" style="border-color: var(--border-color);">
+                        <div class="flex justify-between">
+                            <span>سبد محصولات کانونی:</span>
+                            <span class="font-bold" style="color: var(--text-primary);">ویواکیدز امگا ۳، مولتی‌ویتامین و زینک</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>چرخه استاندارد ویزیت:</span>
+                            <span class="font-bold" style="color: var(--text-primary);">فاصله ۱۴ روزه هدفمند</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Square Primary Action Tiles: مشتری / ویزیت / گزارش / تور -->
+                <div class="grid grid-cols-4 gap-2.5">
+                    <button onclick="switchAppTab('customers')" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] transition">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">مشتری</span>
+                    </button>
+
+                    <button onclick="switchAppTab('visits')" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] transition">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">ویزیت</span>
+                    </button>
+
+                    <button onclick="switchAppTab('reports')" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] transition">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">گزارش</span>
+                    </button>
+
+                    <button onclick="openInfoModal('تور و مسیربندی هوشمند', 'برنامه‌ریزی مسیرهای روزانه و کنترل چرخه ۱۴ روزه ویزیت پزشکان و داروخانه‌ها بر اساس مناطق شهری.')" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] transition">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">تور</span>
+                    </button>
+                </div>
+
+                <!-- Quick Action Rows List (Matching Screenshot 2) -->
+                <div class="pv-card divide-y" style="border-color: var(--border-color);">
+                    <button onclick="switchAppTab('visits'); filterVisitsByStatus('در انتظار تکمیل')" class="w-full p-4 flex items-center justify-between text-right cursor-pointer hover:opacity-85 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl pv-soft-badge flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-bold">تکمیل ویزیت</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="pendingRedDot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                            <svg class="w-4 h-4 pv-muted" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </div>
+                    </button>
+
+                    <button onclick="openAccountManagerModal()" class="w-full p-4 flex items-center justify-between text-right cursor-pointer hover:opacity-85 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl pv-soft-badge flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold">مدیریت کاربران و حساب‌ها</div>
+                                <div class="text-[10px] pv-muted">تعریف نام کاربری و رمز برای کارمندان در فضای ابری</div>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 pv-muted" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <button onclick="switchAppTab('visits'); filterVisitsByStatus('منقضی / رد شده')" class="w-full p-4 flex items-center justify-between text-right cursor-pointer hover:opacity-85 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl pv-soft-badge flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-bold">مشتریان رد شده / آرشیو</span>
+                        </div>
+                        <svg class="w-4 h-4 pv-muted" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- TAB 2: VISIT REGISTRATION SCREEN (Matching Screenshot 3)   -->
+            <!-- ========================================================= -->
+            <div id="tabVisits" class="hidden px-4 space-y-3.5">
+                <!-- Visit Date Selector Card -->
+                <div class="pv-card p-3.5">
+                    <label class="block text-xs font-semibold pv-muted mb-1.5 text-right">تاریخ ویزیت</label>
+                    <input type="text" id="visitDateInput" value="۱۴۰۵/۰۸/۳۰" oninput="renderVisitsList()"
+                        class="w-full pv-input px-4 py-2.5 text-sm font-bold text-center">
+                </div>
+
+                <!-- Colored Status Filter Pills (Matching Screenshot 3) -->
+                <div id="statusFilterPills" class="flex flex-wrap gap-2 justify-center">
+                    <button onclick="filterVisitsByStatus('همه')" data-status="همه"
+                        class="status-pill px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition bg-slate-800 text-white border-slate-800">
+                        ● همه
+                    </button>
+                    <button onclick="filterVisitsByStatus('در انتظار ثبت ویزیت')" data-status="در انتظار ثبت ویزیت"
+                        class="status-pill px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition bg-sky-100 text-sky-800 border-sky-200">
+                        ● در انتظار ثبت ویزیت
+                    </button>
+                    <button onclick="filterVisitsByStatus('در انتظار تکمیل')" data-status="در انتظار تکمیل"
+                        class="status-pill px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition bg-orange-100 text-orange-800 border-orange-200">
+                        ● در انتظار تکمیل
+                    </button>
+                    <button onclick="filterVisitsByStatus('در انتظار تایید')" data-status="در انتظار تایید"
+                        class="status-pill px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition bg-amber-100 text-amber-800 border-amber-200">
+                        ● در انتظار تایید
+                    </button>
+                    <button onclick="filterVisitsByStatus('تایید شده')" data-status="تایید شده"
+                        class="status-pill px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition bg-emerald-100 text-emerald-800 border-emerald-200">
+                        ● تایید شده
+                    </button>
+                    <button onclick="filterVisitsByStatus('ناموفق')" data-status="ناموفق"
+                        class="status-pill px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition bg-slate-200 text-slate-700 border-slate-300">
+                        ● ناموفق
+                    </button>
+                    <button onclick="filterVisitsByStatus('منقضی / رد شده')" data-status="منقضی / رد شده"
+                        class="status-pill px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer transition bg-rose-100 text-rose-800 border-rose-200">
+                        ● منقضی / رد شده
+                    </button>
+                </div>
+
+                <!-- Primary Action Buttons: + ویزیت جدید & کپی ویزیت ها -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button onclick="openNewVisitModal()" class="pv-btn-primary py-3 px-3 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                        <span class="text-base leading-none">+</span>
+                        <span>ویزیت جدید</span>
+                    </button>
+                    <button onclick="copyVisitsSummary()" class="pv-card py-3 px-3 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer hover:opacity-90 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <span>کپی ویزیت ها</span>
+                    </button>
+                </div>
+
+                <!-- Visits Count Label -->
+                <div id="visitsCountText" class="text-xs font-bold pv-muted text-right px-1">
+                    تعداد ویزیت های این تاریخ : ۷
+                </div>
+
+                <!-- Search Customer Input -->
+                <div class="relative">
+                    <input type="text" id="visitSearchInput" oninput="renderVisitsList()" placeholder="جستجوی مشتری..."
+                        class="w-full pv-input pl-4 pr-10 py-2.5 text-xs font-medium text-right">
+                    <svg class="w-4 h-4 pv-muted absolute right-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+
+                <!-- Expandable Accordion Visit Cards -->
+                <div id="visitsListContainer" class="space-y-3"></div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- TAB 3: CUSTOMERS ARCHIVE (Doctors & Pharmacies)           -->
+            <!-- ========================================================= -->
+            <div id="tabCustomers" class="hidden px-4 space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-extrabold">آرشیو پزشکان و داروخانه‌ها</h2>
+                        <p class="text-[11px] pv-muted">ذخیره زنده در دیتابیس ابری Firebase</p>
+                    </div>
+                    <button onclick="openNewCustomerModal()" class="pv-btn-primary px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer">
+                        + افزودن مشتری
+                    </button>
+                </div>
+                <div class="relative">
+                    <input type="text" id="customerSearchInput" oninput="renderCustomersList()" placeholder="جستجوی نام پزشک، تخصص یا مرکز..."
+                        class="w-full pv-input pl-4 pr-10 py-2.5 text-xs font-medium text-right">
+                    <svg class="w-4 h-4 pv-muted absolute right-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <div id="customersListContainer" class="space-y-2.5"></div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- TAB 4: REPORTS & USER PERFORMANCE                         -->
+            <!-- ========================================================= -->
+            <div id="tabReports" class="hidden px-4 space-y-3.5">
+                <h2 class="text-sm font-extrabold">گزارش عملکرد ابری کاربران</h2>
+                <div id="reportsContainer" class="space-y-3"></div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- Bottom Navigation Bar (Matching PouyaVision Screenshot 2&3)-->
+            <!-- خانه / رده‌بندی / چت / رفرش / بازگشت                       -->
+            <!-- ========================================================= -->
+            <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40 px-2 pb-2 pt-1.5 backdrop-blur-md" style="background-color: color-mix(in srgb, var(--bg-card) 92%, transparent); border-top: 1px solid var(--border-color);">
+                <div class="flex items-center justify-around">
+                    <button onclick="switchAppTab('home')" id="bottomNavHome"
+                        class="px-4 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer transition pv-btn-primary">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="text-[11px] font-bold">خانه</span>
+                    </button>
+
+                    <button onclick="switchAppTab('reports')"
+                        class="px-2.5 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-muted hover:opacity-80">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                        </svg>
+                        <span class="text-[10px] font-semibold">رده‌بندی</span>
+                    </button>
+
+                    <button onclick="openInfoModal('یادداشت و چت ابری نووآ', 'تمام ویزیت‌ها، زمان ورود و خروج و یادداشت‌های محصولات پروموت‌شده به صورت زنده بین گوشی‌های تیم همگام‌سازی می‌شود.')"
+                        class="relative px-2.5 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-muted hover:opacity-80">
+                        <span class="w-2 h-2 rounded-full bg-red-500 absolute top-1.5 right-3"></span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        <span class="text-[10px] font-semibold">چت</span>
+                    </button>
+
+                    <button onclick="manualCloudSync()"
+                        class="px-2.5 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-muted hover:opacity-80">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span class="text-[10px] font-semibold">رفرش</span>
+                    </button>
+
+                    <button onclick="handleBackAction()"
+                        class="px-2.5 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-muted hover:opacity-80">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                        <span class="text-[10px] font-semibold">بازگشت</span>
+                    </button>
+                </div>
+            </nav>
+        </section>
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- THEME SWITCHER BOTTOM SHEET (Matching Screenshot 4)        -->
+    <!-- ========================================================= -->
+    <div id="themeSheetOverlay" onclick="closeThemeSheet()" class="fixed inset-0 bg-black/45 backdrop-blur-[2px] z-[60] hidden flex items-end justify-center">
+        <div onclick="event.stopPropagation()" class="w-full max-w-md pv-card rounded-t-[28px] rounded-b-none p-5 space-y-4 shadow-2xl">
+            <div class="w-10 h-1.5 rounded-full mx-auto opacity-30" style="background-color: var(--text-muted);"></div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-extrabold">انتخاب تم</h3>
+                    <p class="text-xs pv-muted mt-0.5">رنگ‌بندی برنامه روی همین گوشی ذخیره می‌شود.</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl pv-soft-badge flex items-center justify-center">
+                    <svg class="w-5 h-5" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 2x2 Theme Grid: تیره / روشن / صورتی / آبی -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <!-- Dark -->
+                <button type="button" onclick="selectTheme('dark')" id="themeCard-dark"
+                    class="theme-option-card p-3.5 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition"
+                    style="border-color: var(--border-color); background-color: var(--bg-subtle);">
+                    <div class="flex items-center gap-2">
+                        <span class="theme-check hidden w-5 h-5 rounded-full border flex items-center justify-center text-xs font-extrabold" style="border-color: var(--accent); color: var(--accent);">✓</span>
+                        <div class="text-right">
+                            <div class="text-sm font-extrabold">تیره</div>
+                            <div class="text-[11px] pv-muted">Dark</div>
+                        </div>
+                    </div>
+                    <span class="w-9 h-9 rounded-full overflow-hidden border border-slate-400/30 shrink-0 flex">
+                        <span class="w-1/2 h-full bg-slate-950"></span>
+                        <span class="w-1/2 h-full bg-sky-500"></span>
+                    </span>
+                </button>
+
+                <!-- Light -->
+                <button type="button" onclick="selectTheme('light')" id="themeCard-light"
+                    class="theme-option-card p-3.5 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition"
+                    style="border-color: var(--border-color); background-color: var(--bg-subtle);">
+                    <div class="flex items-center gap-2">
+                        <span class="theme-check hidden w-5 h-5 rounded-full border flex items-center justify-center text-xs font-extrabold" style="border-color: var(--accent); color: var(--accent);">✓</span>
+                        <div class="text-right">
+                            <div class="text-sm font-extrabold">روشن</div>
+                            <div class="text-[11px] pv-muted">Light</div>
+                        </div>
+                    </div>
+                    <span class="w-9 h-9 rounded-full overflow-hidden border border-slate-300 shrink-0 flex">
+                        <span class="w-1/2 h-full bg-white"></span>
+                        <span class="w-1/2 h-full bg-blue-600"></span>
+                    </span>
+                </button>
+
+                <!-- Pink -->
+                <button type="button" onclick="selectTheme('pink')" id="themeCard-pink"
+                    class="theme-option-card p-3.5 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition"
+                    style="border-color: var(--border-color); background-color: var(--bg-subtle);">
+                    <div class="flex items-center gap-2">
+                        <span class="theme-check hidden w-5 h-5 rounded-full border flex items-center justify-center text-xs font-extrabold" style="border-color: var(--accent); color: var(--accent);">✓</span>
+                        <div class="text-right">
+                            <div class="text-sm font-extrabold">صورتی</div>
+                            <div class="text-[11px] pv-muted">Pink</div>
+                        </div>
+                    </div>
+                    <span class="w-9 h-9 rounded-full bg-pink-600 border border-pink-300 shrink-0"></span>
+                </button>
+
+                <!-- Blue -->
+                <button type="button" onclick="selectTheme('blue')" id="themeCard-blue"
+                    class="theme-option-card p-3.5 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition"
+                    style="border-color: var(--border-color); background-color: var(--bg-subtle);">
+                    <div class="flex items-center gap-2">
+                        <span class="theme-check hidden w-5 h-5 rounded-full border flex items-center justify-center text-xs font-extrabold" style="border-color: var(--accent); color: var(--accent);">✓</span>
+                        <div class="text-right">
+                            <div class="text-sm font-extrabold">آبی</div>
+                            <div class="text-[11px] pv-muted">Blue</div>
+                        </div>
+                    </div>
+                    <span class="w-9 h-9 rounded-full overflow-hidden border border-sky-400/40 shrink-0 flex">
+                        <span class="w-1/2 h-full bg-[#0a192f]"></span>
+                        <span class="w-1/2 h-full bg-sky-400"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ACCOUNT CREATION & MANAGEMENT MODAL (Cloud Synced)        -->
+    <!-- ========================================================= -->
+    <div id="accountModal" class="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-md pv-card p-5 space-y-4 max-h-[88vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                <h3 class="text-sm font-extrabold">مدیریت حساب‌های کاربری نووآ (Cloud)</h3>
+                <button onclick="closeAccountManagerModal()" class="pv-muted hover:opacity-80 text-lg cursor-pointer">✕</button>
+            </div>
+
+            <form onsubmit="handleCreateUserAccount(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold mb-1">نام و نام خانوادگی کارمند</label>
+                    <input type="text" id="newAccFullName" required placeholder="مثلاً: سارا محمدی"
+                        class="w-full pv-input px-3.5 py-2.5 text-xs">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-xs font-bold mb-1">نام کاربری</label>
+                        <input type="text" id="newAccUsername" required placeholder="sara"
+                            class="w-full pv-input px-3.5 py-2.5 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1">رمز عبور</label>
+                        <input type="text" id="newAccPassword" required placeholder="1234"
+                            class="w-full pv-input px-3.5 py-2.5 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">سمت / نقش سازمانی</label>
+                    <select id="newAccRole" class="w-full pv-input px-3.5 py-2.5 text-xs">
+                        <option value="نماینده علمی">نماینده علمی</option>
+                        <option value="سرپرست فروش">سرپرست فروش</option>
+                        <option value="مدیر سیستم / نماینده علمی">مدیر سیستم / نماینده علمی</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full pv-btn-primary py-3 rounded-xl text-xs font-extrabold cursor-pointer">
+                    + ثبت حساب در دیتابیس ابری Firebase
+                </button>
+            </form>
+
+            <div class="space-y-2 pt-2 border-t" style="border-color: var(--border-color);">
+                <div class="text-xs font-bold pv-muted">کاربران تعریف‌شده:</div>
+                <div id="accountsListBox" class="space-y-2 max-h-48 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- NEW VISIT MODAL (Select from Customer Archive or Custom)  -->
+    <!-- ========================================================= -->
+    <div id="newVisitModal" class="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-md pv-card p-5 space-y-3.5 max-h-[88vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                <h3 class="text-sm font-extrabold">ثبت ویزیت جدید</h3>
+                <button onclick="closeNewVisitModal()" class="pv-muted hover:opacity-80 text-lg cursor-pointer">✕</button>
+            </div>
+
+            <form onsubmit="handleAddNewVisit(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold mb-1">انتخاب از آرشیو مشتریان (اختیاری)</label>
+                    <select id="visitCustomerSelect" onchange="fillVisitFromCustomerSelect(this.value)" class="w-full pv-input px-3.5 py-2.5">
+                        <option value="">-- انتخاب سریع از آرشیو پزشکان و داروخانه‌ها --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">نوع مشتری</label>
+                    <select id="visitCustomerType" class="w-full pv-input px-3.5 py-2.5">
+                        <option value="پزشک">پزشک (🩺)</option>
+                        <option value="داروخانه">داروخانه (💊)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">نام پزشک یا داروخانه</label>
+                    <input type="text" id="visitCustomerName" required placeholder="مثلاً: دکتر سیداحمد طباطبائی عقدائی"
+                        class="w-full pv-input px-3.5 py-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">آدرس مطب / بیمارستان</label>
+                    <input type="text" id="visitAddress" required placeholder="تهران شریعتی پایین تر از میرداماد"
+                        class="w-full pv-input px-3.5 py-2.5">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block font-bold mb-1">محصول پروموت‌شده</label>
+                        <input type="text" id="visitProduct" value="ویواکیدز امگا ۳"
+                            class="w-full pv-input px-3.5 py-2.5">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">نوع برنامه‌ریزی</label>
+                        <select id="visitPlanTag" class="w-full pv-input px-3.5 py-2.5">
+                            <option value="پلن شده">پلن شده</option>
+                            <option value="فالوآپ ۱۴ روزه">فالوآپ ۱۴ روزه</option>
+                            <option value="فوق‌العاده">فوق‌العاده</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full pv-btn-primary py-3 rounded-xl font-extrabold cursor-pointer">
+                    ذخیره در برنامه ویزیت
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- NEW CUSTOMER ARCHIVE MODAL                                -->
+    <!-- ========================================================= -->
+    <div id="newCustomerModal" class="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-md pv-card p-5 space-y-3.5 max-h-[88vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                <h3 class="text-sm font-extrabold">افزودن به آرشیو مشتریان نووآ</h3>
+                <button onclick="closeNewCustomerModal()" class="pv-muted hover:opacity-80 text-lg cursor-pointer">✕</button>
+            </div>
+
+            <form onsubmit="handleAddCustomer(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold mb-1">نوع مرکز</label>
+                    <select id="custType" class="w-full pv-input px-3.5 py-2.5">
+                        <option value="پزشک">پزشک (🩺)</option>
+                        <option value="داروخانه">داروخانه (💊)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">نام کامل پزشک یا داروخانه</label>
+                    <input type="text" id="custName" required placeholder="مثلاً: دکتر محمدمهدی تقدیری"
+                        class="w-full pv-input px-3.5 py-2.5">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block font-bold mb-1">تخصص</label>
+                        <input type="text" id="custSpecialty" placeholder="مغز و اعصاب اطفال"
+                            class="w-full pv-input px-3.5 py-2.5">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">شماره تماس</label>
+                        <input type="text" id="custPhone" placeholder="۰۲۱-۲۲۲۲۰۰۰۰"
+                            class="w-full pv-input px-3.5 py-2.5">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">مرکز / بیمارستان / آدرس</label>
+                    <input type="text" id="custAddress" required placeholder="بیمارستان کودکان مفید، خیابان شریعتی"
+                        class="w-full pv-input px-3.5 py-2.5">
+                </div>
+                <button type="submit" class="w-full pv-btn-primary py-3 rounded-xl font-extrabold cursor-pointer">
+                    ذخیره در آرشیو ابری
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- GENERIC INFO MODAL                                        -->
+    <!-- ========================================================= -->
+    <div id="infoModal" class="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[70] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-sm pv-card p-5 space-y-3">
+            <h3 id="infoModalTitle" class="text-sm font-extrabold"></h3>
+            <p id="infoModalBody" class="text-xs pv-muted leading-relaxed whitespace-pre-line"></p>
+            <button onclick="closeInfoModal()" class="w-full pv-btn-primary py-2.5 rounded-xl text-xs font-bold cursor-pointer">
+                بستن
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase v11 Modular SDK + Full Cloud Real-time App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // User's exact Firebase configuration for nova-archive01
+        const firebaseConfig = {
+            apiKey: "AIzaSyChQWFGxcD6Ix3DdiClh_3H6JWPq58cYDg",
+            authDomain: "nova-archive01.firebaseapp.com",
+            projectId: "nova-archive01",
+            storageBucket: "nova-archive01.firebasestorage.app",
+            messagingSenderId: "827397268005",
+            appId: "1:827397268005:web:a923a9f4e0505b34e7d5cc",
+            measurementId: "G-QFGERB5CWS"
+        };
+
+        const DEFAULT_ADMIN_USER = {
+            id: 'u-admin',
+            fullName: 'حسین علی‌شیری',
+            username: 'admin',
+            password: '1234',
+            role: 'مدیر سیستم / نماینده علمی'
+        };
+
+        const DEFAULT_CUSTOMERS = [
+            {
+                id: 'c-1',
+                type: 'پزشک',
+                name: 'دکتر سیداحمد طباطبائی عقدائی',
+                specialty: 'فوق تخصص ریه اطفال',
+                address: 'تهران شریعتی پایین تر از میرداماد',
+                phone: '۰۲۱-۲۲۲۵۴۱۰۰'
+            },
+            {
+                id: 'c-2',
+                type: 'پزشک',
+                name: 'دکتر رضا دلیرانی',
+                specialty: 'متخصص کودکان',
+                address: 'تهران خیابان ولیعصر، نرسیده به توانیر',
+                phone: '۰۲۱-۸۸۷۷۳۲۱۰'
+            },
+            {
+                id: 'c-3',
+                type: 'پزشک',
+                name: 'دکتر ودود جوادی پروانه',
+                specialty: 'فوق تخصص عفونی اطفال',
+                address: 'تهران بیمارستان کودکان مفید، شریعتی',
+                phone: '۰۲۱-۲۲۲۲۷۰۲۱'
+            },
+            {
+                id: 'c-4',
+                type: 'پزشک',
+                name: 'دکتر پروانه کریم زاده',
+                specialty: 'فوق تخصص مغز و اعصاب کودکان',
+                address: 'تهران پاسداران، بوستان دوم',
+                phone: '۰۲۱-۲۲۵۵۸۹۱۰'
+            },
+            {
+                id: 'c-5',
+                type: 'پزشک',
+                name: 'دکتر محسن جوادزاده',
+                specialty: 'فوق تخصص مغز و اعصاب اطفال',
+                address: 'تهران میرداماد، میدان مادر',
+                phone: '۰۲۱-۲۲۲۶۱۴۰۰'
+            },
+            {
+                id: 'c-6',
+                type: 'داروخانه',
+                name: 'داروخانه دکتر سمیعی',
+                specialty: 'داروخانه منتخب شبانه‌روزی',
+                address: 'تهران خیابان شریعتی، بالاتر از میرداماد',
+                phone: '۰۲۱-۲۲۲۷۴۵۰۰'
+            },
+            {
+                id: 'c-7',
+                type: 'داروخانه',
+                name: 'داروخانه دکتر هدایتی',
+                specialty: 'داروخانه تخصصی کودک',
+                address: 'تهران پاسداران، نبش گلستان',
+                phone: '۰۲۱-۲۲۵۴۹۸۰۰'
+            }
+        ];
+
+        const DEFAULT_VISITS = [
+            {
+                id: 'v-585984',
+                visitNumber: '۵۸۵۹۸۴',
+                date: '۱۴۰۵/۰۸/۳۰',
+                customerType: 'پزشک',
+                customerName: 'دکتر سیداحمد طباطبائی عقدائی',
+                address: 'تهران شریعتی پایین تر از میرداماد',
+                product: 'ویواکیدز امگا ۳',
+                note: '',
+                planTag: 'پلن شده',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: 'admin',
+                expanded: true
+            },
+            {
+                id: 'v-585986',
+                visitNumber: '۵۸۵۹۸۶',
+                date: '۱۴۰۵/۰۸/۳۰',
+                customerType: 'پزشک',
+                customerName: 'دکتر رضا دلیرانی',
+                address: 'تهران خیابان ولیعصر، نرسیده به توانیر',
+                product: 'ویواکیدز مولتی‌ویتامین',
+                note: '',
+                planTag: 'پلن شده',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: 'admin',
+                expanded: false
+            },
+            {
+                id: 'v-585987',
+                visitNumber: '۵۸۵۹۸۷',
+                date: '۱۴۰۵/۰۸/۳۰',
+                customerType: 'پزشک',
+                customerName: 'دکتر ودود جوادی پروانه',
+                address: 'تهران بیمارستان کودکان مفید، شریعتی',
+                product: 'ویواکیدز دی۳',
+                note: '',
+                planTag: 'فالوآپ ۱۴ روزه',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: 'admin',
+                expanded: false
+            },
+            {
+                id: 'v-585988',
+                visitNumber: '۵۸۵۹۸۸',
+                date: '۱۴۰۵/۰۸/۳۰',
+                customerType: 'پزشک',
+                customerName: 'دکتر پروانه کریم زاده',
+                address: 'تهران پاسداران، بوستان دوم',
+                product: 'ویواکیدز زینک پلاس',
+                note: '',
+                planTag: 'پلن شده',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: 'admin',
+                expanded: false
+            },
+            {
+                id: 'v-585989',
+                visitNumber: '۵۸۵۹۸۹',
+                date: '۱۴۰۵/۰۸/۳۰',
+                customerType: 'پزشک',
+                customerName: 'دکتر محسن جوادزاده',
+                address: 'تهران میرداماد، میدان مادر',
+                product: 'ویواکیدز آهن و ویتامین ث',
+                note: '',
+                planTag: 'پلن شده',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: 'admin',
+                expanded: false
+            },
+            {
+                id: 'v-585990',
+                visitNumber: '۵۸۵۹۹۰',
+                date: '۱۴۰۵/۰۸/۳۰',
+                customerType: 'داروخانه',
+                customerName: 'داروخانه دکتر سمیعی',
+                address: 'تهران خیابان شریعتی، بالاتر از میرداماد',
+                product: 'ویواکیدز امگا ۳',
+                note: '',
+                planTag: 'پلن شده',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: 'admin',
+                expanded: false
+            },
+            {
+                id: 'v-585991',
+                visitNumber: '۵۸۵۹۹۱',
+                date: '۱۴۰۵/۰۸/۳۰',
+                customerType: 'داروخانه',
+                customerName: 'داروخانه دکتر هدایتی',
+                address: 'تهران پاسداران، نبش گلستان',
+                product: 'ویواکیدز مولتی‌ویتامین',
+                note: '',
+                planTag: 'پلن شده',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: 'admin',
+                expanded: false
+            }
+        ];
+
+        const STORAGE_KEY = 'nova_archive01_local_v2';
+        const SESSION_USER_KEY = 'nova_archive01_session_user_v2';
+        const THEME_KEY = 'nova_archive01_theme_v2';
+
+        let appState = loadLocalState();
+        let currentUser = loadSessionUser();
+        let currentCaptcha = 'TSLU';
+        let activeAppTab = 'home';
+        let activeStatusFilter = 'همه';
+
+        let db = null;
+        let workspaceDocRef = null;
+        let isCloudOnline = false;
+
+        function loadLocalState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    return {
+                        users: [structuredClone(DEFAULT_ADMIN_USER)],
+                        customers: structuredClone(DEFAULT_CUSTOMERS),
+                        visits: structuredClone(DEFAULT_VISITS)
+                    };
+                }
+                const parsed = JSON.parse(raw);
+                const users = Array.isArray(parsed.users) && parsed.users.length ? parsed.users : [structuredClone(DEFAULT_ADMIN_USER)];
+                if (!users.some(u => u.username === 'admin')) {
+                    users.unshift(structuredClone(DEFAULT_ADMIN_USER));
+                }
+                return {
+                    users,
+                    customers: Array.isArray(parsed.customers) ? parsed.customers : structuredClone(DEFAULT_CUSTOMERS),
+                    visits: Array.isArray(parsed.visits) ? parsed.visits : structuredClone(DEFAULT_VISITS)
+                };
+            } catch (_) {
+                return {
+                    users: [structuredClone(DEFAULT_ADMIN_USER)],
+                    customers: structuredClone(DEFAULT_CUSTOMERS),
+                    visits: structuredClone(DEFAULT_VISITS)
+                };
+            }
+        }
+
+        function saveLocalState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            } catch (_) {}
+        }
+
+        function loadSessionUser() {
+            try {
+                const raw = localStorage.getItem(SESSION_USER_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function saveSessionUser(user) {
+            currentUser = user;
+            try {
+                if (user) {
+                    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(user));
+                } else {
+                    localStorage.removeItem(SESSION_USER_KEY);
+                }
+            } catch (_) {}
+        }
+
+        // Direct Connection to Firebase Firestore (nova-archive01)
+        async function initFirebaseCloud() {
+            try {
+                const fbApp = initializeApp(firebaseConfig);
+                const auth = getAuth(fbApp);
+                db = getFirestore(fbApp);
+
+                // Sign in anonymously to satisfy Firestore rules if enabled
+                try {
+                    await signInAnonymously(auth);
+                } catch (authErr) {
+                    console.warn('Anonymous auth note:', authErr.message);
+                }
+
+                // Shared workspace document in Firestore collection 'nova_system'
+                workspaceDocRef = doc(db, 'nova_system', 'nova_archive01_workspace');
+
+                // Check if document exists; if not, seed default admin + sample data
+                const initialSnap = await getDoc(workspaceDocRef);
+                if (!initialSnap.exists()) {
+                    await setDoc(workspaceDocRef, {
+                        users: appState.users,
+                        customers: appState.customers,
+                        visits: appState.visits,
+                        createdAt: Date.now(),
+                        updatedAt: Date.now()
+                    });
+                } else {
+                    const data = initialSnap.data();
+                    const cloudUsers = Array.isArray(data.users) && data.users.length ? data.users : [structuredClone(DEFAULT_ADMIN_USER)];
+                    if (!cloudUsers.some(u => u.username === 'admin')) {
+                        cloudUsers.unshift(structuredClone(DEFAULT_ADMIN_USER));
+                    }
+                    appState.users = cloudUsers;
+                    if (Array.isArray(data.customers)) appState.customers = data.customers;
+                    if (Array.isArray(data.visits)) appState.visits = data.visits;
+                    saveLocalState();
+                }
+
+                setCloudStatusUI(true);
+
+                // Real-time listener for instant sync across devices
+                onSnapshot(workspaceDocRef, (snap) => {
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (Array.isArray(data.users) && data.users.length) {
+                            appState.users = data.users;
+                        }
+                        if (Array.isArray(data.customers)) {
+                            appState.customers = data.customers;
+                        }
+                        if (Array.isArray(data.visits)) {
+                            appState.visits = data.visits;
+                        }
+                        saveLocalState();
+                        setCloudStatusUI(true);
+                        refreshAllViews();
+                    }
+                }, (err) => {
+                    console.warn('Firestore snapshot warning:', err.message);
+                    setCloudStatusUI(false);
+                });
+
+            } catch (err) {
+                console.error('Firebase initialization error:', err);
+                setCloudStatusUI(false);
+            }
+        }
+
+        function setCloudStatusUI(online) {
+            isCloudOnline = online;
+            const dot = document.getElementById('cloudStatusDot');
+            const label = document.getElementById('cloudStatusLabel');
+            const hDot = document.getElementById('headerCloudDot');
+            const hText = document.getElementById('headerCloudText');
+
+            if (online) {
+                if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                if (label) label.innerText = 'Online • متصل به nova-archive01';
+                if (hDot) hDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+                if (hText) hText.innerText = 'Online • ابری';
+            } else {
+                if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+                if (label) label.innerText = 'حالت آفلاین (ذخیره محلی)';
+                if (hDot) hDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400';
+                if (hText) hText.innerText = 'Offline • محلی';
+            }
+        }
+
+        async function syncStateToCloud(toastMessage = null) {
+            saveLocalState();
+            if (db && workspaceDocRef) {
+                try {
+                    await setDoc(workspaceDocRef, {
+                        users: appState.users,
+                        customers: appState.customers,
+                        visits: appState.visits,
+                        updatedAt: Date.now()
+                    }, { merge: true });
+                    setCloudStatusUI(true);
+                } catch (err) {
+                    console.warn('Firestore sync fallback to local:', err.message);
+                    setCloudStatusUI(false);
+                }
+            }
+            if (toastMessage) showToast(toastMessage, '✅');
+            refreshAllViews();
+        }
+
+        // Toast helpers
+        let toastTimer = null;
+        window.showToast = function (message, icon = '✨') {
+            const banner = document.getElementById('toastBanner');
+            document.getElementById('toastText').innerText = message;
+            document.getElementById('toastIcon').innerText = icon;
+            banner.classList.remove('opacity-0', 'pointer-events-none');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                banner.classList.add('opacity-0', 'pointer-events-none');
+            }, 2800);
+        };
+
+        window.hideToast = function () {
+            document.getElementById('toastBanner').classList.add('opacity-0', 'pointer-events-none');
+        };
+
+        // Time-based Greeting
+        function updateTimeGreeting() {
+            const hour = new Date().getHours();
+            const greetingEl = document.getElementById('headerGreeting');
+            if (!greetingEl) return;
+            if (hour >= 5 && hour < 12) {
+                greetingEl.innerHTML = '<span>صبح بخیر</span><span>☀️</span>';
+            } else if (hour >= 12 && hour < 18) {
+                greetingEl.innerHTML = '<span>عصر بخیر</span><span>🌤️</span>';
+            } else {
+                greetingEl.innerHTML = '<span>شب بخیر</span><span>🌙</span>';
+            }
+        }
+
+        // Theme Switcher (Light, Dark, Blue, Pink)
+        function applySavedTheme() {
+            const saved = localStorage.getItem(THEME_KEY) || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            highlightActiveThemeCard(saved);
+        }
+
+        function highlightActiveThemeCard(themeName) {
+            document.querySelectorAll('.theme-option-card').forEach(card => {
+                card.style.borderColor = 'var(--border-color)';
+                const check = card.querySelector('.theme-check');
+                if (check) check.classList.add('hidden');
+            });
+            const activeCard = document.getElementById(`themeCard-${themeName}`);
+            if (activeCard) {
+                activeCard.style.borderColor = 'var(--accent)';
+                const check = activeCard.querySelector('.theme-check');
+                if (check) check.classList.remove('hidden');
+            }
+        }
+
+        window.openThemeSheet = function () {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            highlightActiveThemeCard(current);
+            document.getElementById('themeSheetOverlay').classList.remove('hidden');
+        };
+
+        window.closeThemeSheet = function () {
+            document.getElementById('themeSheetOverlay').classList.add('hidden');
+        };
+
+        window.selectTheme = function (themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem(THEME_KEY, themeName);
+            highlightActiveThemeCard(themeName);
+            const names = { dark: 'تیره', light: 'روشن', pink: 'صورتی', blue: 'آبی' };
+            showToast(`تم ${names[themeName] || themeName} روی گوشی ذخیره شد`, '🎨');
+            setTimeout(() => closeThemeSheet(), 180);
+        };
+
+        // Captcha
+        window.refreshCaptcha = function () {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            currentCaptcha = code;
+            document.getElementById('captchaDisplay').innerText = code;
+        };
+
+        window.togglePasswordVisibility = function () {
+            const input = document.getElementById('loginPassword');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        };
+
+        window.quickFillDemoUser = function () {
+            document.getElementById('loginUsername').value = 'admin';
+            document.getElementById('loginPassword').value = '1234';
+            document.getElementById('loginCaptchaInput').value = currentCaptcha;
+            showToast('اطلاعات مدیر (admin / 1234) پر شد', '🔑');
+        };
+
+        // Login / Logout
+        window.handleLoginSubmit = function (e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const captchaVal = document.getElementById('loginCaptchaInput').value.trim().toUpperCase();
+
+            if (captchaVal !== currentCaptcha) {
+                showToast('عبارت امنیتی اشتباه است. دوباره تلاش کنید.', '⚠️');
+                refreshCaptcha();
+                document.getElementById('loginCaptchaInput').value = '';
+                return;
+            }
+
+            const found = appState.users.find(
+                u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+            );
+
+            if (!found) {
+                showToast('نام کاربری یا رمز عبور نادرست است', '❌');
+                return;
+            }
+
+            saveSessionUser(found);
+            enterMainApp();
+            showToast(`خوش آمدید ${found.fullName}`, '👋');
+        };
+
+        window.handleLogout = function () {
+            saveSessionUser(null);
+            refreshCaptcha();
+            document.getElementById('loginCaptchaInput').value = '';
+            document.getElementById('mainAppScreen').classList.add('hidden');
+            document.getElementById('mainAppScreen').classList.remove('flex');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            showToast('از حساب کاربری خارج شدید', '🚪');
+        };
+
+        function enterMainApp() {
+            const user = currentUser || appState.users[0];
+            updateTimeGreeting();
+            document.getElementById('headerUserName').innerText = user.fullName;
+            document.getElementById('headerUserAvatar').innerText = user.fullName.charAt(0) || 'ح';
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainAppScreen').classList.remove('hidden');
+            document.getElementById('mainAppScreen').classList.add('flex');
+            switchAppTab('home');
+            refreshAllViews();
+        }
+
+        // User Account Creation / Deletion (Admin Cloud Feature)
+        window.openAccountManagerModal = function () {
+            renderAccountsList();
+            document.getElementById('accountModal').classList.remove('hidden');
+        };
+
+        window.closeAccountManagerModal = function () {
+            document.getElementById('accountModal').classList.add('hidden');
+        };
+
+        window.handleCreateUserAccount = async function (e) {
+            e.preventDefault();
+            const fullName = document.getElementById('newAccFullName').value.trim();
+            const username = document.getElementById('newAccUsername').value.trim();
+            const password = document.getElementById('newAccPassword').value.trim();
+            const role = document.getElementById('newAccRole').value;
+
+            if (!fullName || !username || !password) return;
+
+            if (appState.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast('این نام کاربری قبلاً در سیستم ثبت شده است', '⚠️');
+                return;
+            }
+
+            appState.users.push({
+                id: 'u-' + Date.now(),
+                fullName,
+                username,
+                password,
+                role
+            });
+
+            document.getElementById('newAccFullName').value = '';
+            document.getElementById('newAccUsername').value = '';
+            document.getElementById('newAccPassword').value = '';
+
+            await syncStateToCloud(`حساب «${fullName}» در فضای ابری ذخیره شد`);
+            renderAccountsList();
+        };
+
+        window.deleteUserAccount = async function (userId) {
+            if (userId === 'u-admin') {
+                showToast('حساب مدیر اصلی قابل حذف نیست', '⚠️');
+                return;
+            }
+            appState.users = appState.users.filter(u => u.id !== userId);
+            await syncStateToCloud('حساب کاربری حذف شد');
+            renderAccountsList();
+        };
+
+        function renderAccountsList() {
+            const box = document.getElementById('accountsListBox');
+            box.innerHTML = appState.users.map(u => `
+                <div class="pv-subtle p-3 rounded-xl flex items-center justify-between text-xs gap-2">
+                    <div>
+                        <div class="font-extrabold">${u.fullName}</div>
+                        <div class="text-[11px] pv-muted mt-0.5">نام کاربری: <b>${u.username}</b> | رمز: <b>${u.password}</b></div>
+                        <div class="text-[10px] font-bold mt-0.5" style="color: var(--accent);">${u.role}</div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="switchToUser('${u.id}')" class="pv-btn-primary px-2.5 py-1.5 rounded-lg text-[11px] font-bold cursor-pointer">
+                            ورود
+                        </button>
+                        ${u.id !== 'u-admin' ? `
+                            <button type="button" onclick="deleteUserAccount('${u.id}')" class="text-rose-500 p-1.5 cursor-pointer" title="حذف">
+                                ✕
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.switchToUser = function (userId) {
+            const u = appState.users.find(item => item.id === userId);
+            if (!u) return;
+            saveSessionUser(u);
+            closeAccountManagerModal();
+            enterMainApp();
+            showToast(`وارد حساب ${u.fullName} شدید`, '👤');
+        };
+
+        // Tab Navigation
+        window.switchAppTab = function (tabName) {
+            activeAppTab = tabName;
+            document.getElementById('tabHome').classList.toggle('hidden', tabName !== 'home');
+            document.getElementById('tabVisits').classList.toggle('hidden', tabName !== 'visits');
+            document.getElementById('tabCustomers').classList.toggle('hidden', tabName !== 'customers');
+            document.getElementById('tabReports').classList.toggle('hidden', tabName !== 'reports');
+
+            const homeBtn = document.getElementById('bottomNavHome');
+            if (tabName === 'home') {
+                homeBtn.className = 'px-4 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer transition pv-btn-primary';
+            } else {
+                homeBtn.className = 'px-2.5 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer transition pv-muted hover:opacity-80';
+            }
+
+            if (tabName === 'visits') renderVisitsList();
+            if (tabName === 'customers') renderCustomersList();
+            if (tabName === 'reports') renderReportsView();
+        };
+
+        window.toggleBonusAccordion = function () {
+            document.getElementById('bonusAccordionBody').classList.toggle('hidden');
+            document.getElementById('bonusChevron').classList.toggle('rotate-180');
+        };
+
+        function toPersianDigits(num) {
+            const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            return String(num).replace(/\d/g, d => persian[Number(d)]);
+        }
+
+        // Home Dashboard Stats
+        function renderDashboardStats() {
+            const total = appState.visits.length;
+            const completed = appState.visits.filter(v => v.status === 'تایید شده').length;
+            const pendingCompletion = appState.visits.filter(v => v.status === 'در انتظار تکمیل' || v.status === 'در انتظار تایید').length;
+
+            document.getElementById('statTotalVisits').innerText = toPersianDigits(total);
+            document.getElementById('statCompletedVisits').innerText = toPersianDigits(completed);
+            document.getElementById('statPendingVisits').innerText = toPersianDigits(pendingCompletion);
+            document.getElementById('homeProgressBadge').innerText = `${toPersianDigits(completed)} از ${toPersianDigits(total)} انجام شد`;
+
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('homeProgressBar').style.width = `${pct}%`;
+
+            const remainingTarget = Math.max(0, 76 - completed);
+            document.getElementById('bonusRemainingText').innerText =
+                `فقط ${toPersianDigits(remainingTarget)} ویزیت تا جایزه‌ی ۱۰ میلیونی`;
+
+            const redDot = document.getElementById('pendingRedDot');
+            if (redDot) {
+                redDot.classList.toggle('hidden', pendingCompletion === 0 && total === completed);
+            }
+        }
+
+        // Visit Filtering & Accordion Cards (Matching Screenshot 3)
+        window.filterVisitsByStatus = function (status) {
+            activeStatusFilter = status;
+            document.querySelectorAll('.status-pill').forEach(pill => {
+                const isSelected = pill.getAttribute('data-status') === status;
+                pill.classList.toggle('ring-2', isSelected);
+                pill.classList.toggle('ring-offset-1', isSelected);
+            });
+            renderVisitsList();
+        };
+
+        window.toggleVisitCardExpand = function (visitId) {
+            const v = appState.visits.find(item => item.id === visitId);
+            if (!v) return;
+            v.expanded = !v.expanded;
+            saveLocalState();
+            renderVisitsList();
+        };
+
+        window.setVisitTimingMode = async function (visitId, mode) {
+            const v = appState.visits.find(item => item.id === visitId);
+            if (!v) return;
+            v.timingMode = mode;
+            await syncStateToCloud(mode === 'ontime' ? 'ثبت ویزیت به موقع انتخاب شد' : 'ثبت ویزیت با تاخیر انتخاب شد');
+        };
+
+        window.recordVisitEntry = async function (visitId) {
+            const v = appState.visits.find(item => item.id === visitId);
+            if (!v) return;
+            const now = new Date();
+            const timeStr = toPersianDigits(now.toTimeString().slice(0, 5));
+            v.entryTime = timeStr;
+            if (v.status === 'در انتظار ثبت ویزیت') {
+                v.status = 'در انتظار تکمیل';
+            }
+            if (currentUser) v.repUsername = currentUser.username;
+            await syncStateToCloud(`ساعت ورود (${timeStr}) در Firebase ثبت شد`);
+        };
+
+        window.recordVisitExit = async function (visitId) {
+            const v = appState.visits.find(item => item.id === visitId);
+            if (!v) return;
+            const now = new Date();
+            const timeStr = toPersianDigits(now.toTimeString().slice(0, 5));
+            if (!v.entryTime) v.entryTime = timeStr;
+            v.exitTime = timeStr;
+            v.status = 'تایید شده';
+            if (currentUser) v.repUsername = currentUser.username;
+            await syncStateToCloud(`ساعت خروج (${timeStr}) ثبت و ویزیت تایید شد`);
+        };
+
+        window.saveVisitNoteAndProduct = async function (visitId) {
+            const v = appState.visits.find(item => item.id === visitId);
+            if (!v) return;
+            const prodInput = document.getElementById(`prodInput-${visitId}`);
+            const noteInput = document.getElementById(`noteInput-${visitId}`);
+            if (prodInput) v.product = prodInput.value.trim() || v.product;
+            if (noteInput) v.note = noteInput.value.trim();
+            await syncStateToCloud('محصول پروموت‌شده و فیدبک ویزیت ذخیره شد');
+        };
+
+        window.resetVisit = async function (visitId) {
+            const v = appState.visits.find(item => item.id === visitId);
+            if (!v) return;
+            v.entryTime = null;
+            v.exitTime = null;
+            v.status = 'در انتظار ثبت ویزیت';
+            v.timingMode = 'ontime';
+            await syncStateToCloud('وضعیت ویزیت ریست شد');
+        };
+
+        window.markVisitUnsuccessful = async function (visitId) {
+            const v = appState.visits.find(item => item.id === visitId);
+            if (!v) return;
+            v.status = 'ناموفق';
+            await syncStateToCloud('ویزیت به عنوان ناموفق ثبت شد');
+        };
+
+        window.deleteVisit = async function (visitId) {
+            appState.visits = appState.visits.filter(item => item.id !== visitId);
+            await syncStateToCloud('ویزیت از دیتابیس حذف شد');
+        };
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'در انتظار ثبت ویزیت':
+                    return 'bg-sky-100 text-sky-700';
+                case 'در انتظار تکمیل':
+                    return 'bg-orange-100 text-orange-700';
+                case 'در انتظار تایید':
+                    return 'bg-amber-100 text-amber-800';
+                case 'تایید شده':
+                    return 'bg-emerald-100 text-emerald-700';
+                case 'ناموفق':
+                    return 'bg-slate-200 text-slate-700';
+                case 'منقضی / رد شده':
+                    return 'bg-rose-100 text-rose-700';
+                default:
+                    return 'bg-sky-100 text-sky-700';
+            }
+        }
+
+        function renderVisitsList() {
+            const container = document.getElementById('visitsListContainer');
+            if (!container) return;
+
+            const searchQuery = (document.getElementById('visitSearchInput')?.value || '').trim().toLowerCase();
+
+            const filtered = appState.visits.filter(v => {
+                const matchesStatus = activeStatusFilter === 'همه' || v.status === activeStatusFilter;
+                const matchesSearch = !searchQuery ||
+                    v.customerName.toLowerCase().includes(searchQuery) ||
+                    v.address.toLowerCase().includes(searchQuery) ||
+                    v.visitNumber.includes(searchQuery);
+                return matchesStatus && matchesSearch;
+            });
+
+            document.getElementById('visitsCountText').innerText =
+                `تعداد ویزیت های این تاریخ : ${toPersianDigits(filtered.length)}`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="pv-card p-6 text-center text-xs pv-muted">
+                        هیچ ویزیتی با این فیلتر یا جستجو یافت نشد.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(v => {
+                const icon = v.customerType === 'داروخانه' ? '💊' : '👨‍⚕️';
+                const badgeClass = getStatusBadgeClass(v.status);
+                const isOntime = v.timingMode === 'ontime';
+
+                return `
+                    <div class="pv-card p-4 space-y-3">
+                        <!-- Card Header Row -->
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <button type="button" onclick="toggleVisitCardExpand('${v.id}')"
+                                    class="w-9 h-9 rounded-full pv-subtle flex items-center justify-center font-extrabold text-base shrink-0 cursor-pointer">
+                                    ${v.expanded ? '−' : '+'}
+                                </button>
+                                <div class="min-w-0">
+                                    <div class="font-extrabold text-sm truncate flex items-center gap-1.5">
+                                        <span>${icon}</span>
+                                        <span class="truncate">${v.customerName}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                        <span class="text-[11px] pv-muted">شماره ویزیت ${v.visitNumber}</span>
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${badgeClass}">
+                                            ● ${v.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${v.expanded ? `
+                            <!-- Pill Buttons Row: تاریخچه ویزیت مشتری / ریست / ناموفق / حذف -->
+                            <div class="flex items-center justify-between gap-1.5 flex-wrap pt-1">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <button type="button" onclick="openInfoModal('تاریخچه ویزیت مشتری', 'مشتری: ${v.customerName}\\nمحصول پروموت‌شده: ${v.product}\\nوضعیت: ${v.status}\\nیادداشت قبلی: ${v.note || 'ثبت نشده'}')"
+                                        class="px-3 py-1.5 rounded-full text-[11px] font-bold pv-soft-badge cursor-pointer">
+                                        تاریخچه ویزیت مشتری
+                                    </button>
+                                    <button type="button" onclick="resetVisit('${v.id}')"
+                                        class="px-3 py-1.5 rounded-full text-[11px] font-bold pv-soft-badge cursor-pointer">
+                                        ریست
+                                    </button>
+                                    <button type="button" onclick="markVisitUnsuccessful('${v.id}')"
+                                        class="px-3 py-1.5 rounded-full text-[11px] font-bold pv-subtle pv-muted cursor-pointer">
+                                        ناموفق
+                                    </button>
+                                </div>
+                                <button type="button" onclick="deleteVisit('${v.id}')" title="حذف ویزیت"
+                                    class="text-rose-500 hover:text-rose-600 p-1.5 cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Visit Number, Address, Status & Plan Tag -->
+                            <div class="space-y-1.5 text-xs pt-1">
+                                <div class="font-bold">شماره ویزیت : ${v.visitNumber}</div>
+                                <div class="flex items-start gap-1.5 pv-muted">
+                                    <span class="shrink-0 mt-0.5">📍</span>
+                                    <span>${v.address}</span>
+                                </div>
+                                <div class="flex items-center justify-between pt-0.5">
+                                    <span class="text-[11px] pv-muted">${v.status}</span>
+                                    <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full pv-soft-badge">${v.planTag}</span>
+                                </div>
+                            </div>
+
+                            <!-- Product & Feedback Quick Save -->
+                            <div class="pv-subtle p-2.5 rounded-2xl space-y-2">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="prodInput-${v.id}" value="${v.product}" placeholder="محصول پروموت‌شده..."
+                                        class="pv-input px-2.5 py-1.5 text-[11px]">
+                                    <input type="text" id="noteInput-${v.id}" value="${v.note || ''}" placeholder="یادداشت / فیدبک..."
+                                        class="pv-input px-2.5 py-1.5 text-[11px]">
+                                </div>
+                                <button type="button" onclick="saveVisitNoteAndProduct('${v.id}')"
+                                    class="w-full py-1.5 rounded-xl text-[11px] font-bold pv-soft-badge cursor-pointer">
+                                    ثبت محصول و فیدبک در ابر
+                                </button>
+                            </div>
+
+                            <!-- Timing Toggle: ثبت ویزیت به موقع / ثبت ویزیت با تاخیر -->
+                            <div class="pv-subtle p-1.5 rounded-2xl grid grid-cols-2 gap-1.5">
+                                <button type="button" onclick="setVisitTimingMode('${v.id}', 'delayed')"
+                                    class="py-2 rounded-xl text-xs font-bold cursor-pointer transition ${!isOntime ? 'pv-card shadow-sm' : 'pv-muted'}">
+                                    ثبت ویزیت با تاخیر
+                                </button>
+                                <button type="button" onclick="setVisitTimingMode('${v.id}', 'ontime')"
+                                    class="py-2 rounded-xl text-xs font-extrabold cursor-pointer transition ${isOntime ? 'pv-card shadow-sm' : 'pv-muted'}"
+                                    style="${isOntime ? 'color: var(--accent);' : ''}">
+                                    ثبت ویزیت به موقع
+                                </button>
+                            </div>
+
+                            <!-- Entry / Exit Labels & Buttons -->
+                            <div class="grid grid-cols-2 gap-2.5 text-center pt-1">
+                                <div>
+                                    <div class="text-[11px] font-semibold pv-muted mb-1.5">
+                                        ${v.exitTime ? `ساعت خروج: ${v.exitTime}` : 'وارد نشده'}
+                                    </div>
+                                    <button type="button" onclick="recordVisitExit('${v.id}')"
+                                        class="w-full py-3 rounded-2xl text-xs font-extrabold pv-btn-primary shadow-sm cursor-pointer">
+                                        خروج
+                                    </button>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] font-semibold pv-muted mb-1.5">
+                                        ${v.entryTime ? `ساعت ورود: ${v.entryTime}` : 'وارد نشده'}
+                                    </div>
+                                    <button type="button" onclick="recordVisitEntry('${v.id}')"
+                                        class="w-full py-3 rounded-2xl text-xs font-extrabold cursor-pointer transition"
+                                        style="background-color: var(--accent-soft); color: var(--accent-text);">
+                                        ورود
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // New Visit Modal & Customer Archive Integration
+        window.openNewVisitModal = function () {
+            const select = document.getElementById('visitCustomerSelect');
+            select.innerHTML = `<option value="">-- انتخاب سریع از آرشیو پزشکان و داروخانه‌ها --</option>` +
+                appState.customers.map(c => `<option value="${c.id}">${c.type === 'داروخانه' ? '💊' : '🩺'} ${c.name}</option>`).join('');
+            document.getElementById('newVisitModal').classList.remove('hidden');
+        };
+
+        window.closeNewVisitModal = function () {
+            document.getElementById('newVisitModal').classList.add('hidden');
+        };
+
+        window.fillVisitFromCustomerSelect = function (custId) {
+            const cust = appState.customers.find(c => c.id === custId);
+            if (!cust) return;
+            document.getElementById('visitCustomerType').value = cust.type;
+            document.getElementById('visitCustomerName').value = cust.name;
+            document.getElementById('visitAddress').value = cust.address;
+        };
+
+        window.handleAddNewVisit = async function (e) {
+            e.preventDefault();
+            const customerType = document.getElementById('visitCustomerType').value;
+            const customerName = document.getElementById('visitCustomerName').value.trim();
+            const address = document.getElementById('visitAddress').value.trim();
+            const product = document.getElementById('visitProduct').value.trim() || 'ویواکیدز امگا ۳';
+            const planTag = document.getElementById('visitPlanTag').value;
+            const dateVal = document.getElementById('visitDateInput')?.value || '۱۴۰۵/۰۸/۳۰';
+
+            if (!customerName || !address) return;
+
+            const randomNum = String(Math.floor(586000 + Math.random() * 9000));
+            appState.visits.unshift({
+                id: 'v-' + Date.now(),
+                visitNumber: toPersianDigits(randomNum),
+                date: dateVal,
+                customerType,
+                customerName,
+                address,
+                product,
+                note: '',
+                planTag,
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: currentUser ? currentUser.username : 'admin',
+                expanded: true
+            });
+
+            // Also ensure customer exists in archive
+            if (!appState.customers.some(c => c.name === customerName)) {
+                appState.customers.unshift({
+                    id: 'c-' + Date.now(),
+                    type: customerType,
+                    name: customerName,
+                    specialty: customerType === 'داروخانه' ? 'داروخانه' : 'پزشک متخصص',
+                    address,
+                    phone: 'ثبت نشده'
+                });
+            }
+
+            document.getElementById('visitCustomerName').value = '';
+            document.getElementById('visitAddress').value = '';
+            closeNewVisitModal();
+            switchAppTab('visits');
+            await syncStateToCloud(`ویزیت جدید «${customerName}» در Firebase ثبت شد`);
+        };
+
+        window.copyVisitsSummary = function () {
+            const dateVal = document.getElementById('visitDateInput')?.value || '۱۴۰۵/۰۸/۳۰';
+            const lines = appState.visits.map((v, idx) =>
+                `${idx + 1}. ${v.customerName} (${v.status}) - ${v.address}`
+            );
+            const summaryText = `گزارش ویزیت نووآ | تاریخ ${dateVal}\n` + lines.join('\n');
+
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = summaryText;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('لیست ویزیت‌ها در کلیپ‌بورد کپی شد', '📋');
+            } catch (_) {
+                showToast('امکان کپی خودکار وجود نداشت', '⚠️');
+            }
+            document.body.removeChild(tempTextarea);
+        };
+
+        // Customers Archive Tab & Modal
+        window.openNewCustomerModal = function () {
+            document.getElementById('newCustomerModal').classList.remove('hidden');
+        };
+
+        window.closeNewCustomerModal = function () {
+            document.getElementById('newCustomerModal').classList.add('hidden');
+        };
+
+        window.handleAddCustomer = async function (e) {
+            e.preventDefault();
+            const type = document.getElementById('custType').value;
+            const name = document.getElementById('custName').value.trim();
+            const specialty = document.getElementById('custSpecialty').value.trim() || (type === 'داروخانه' ? 'داروخانه' : 'متخصص');
+            const phone = document.getElementById('custPhone').value.trim() || 'ثبت نشده';
+            const address = document.getElementById('custAddress').value.trim();
+
+            if (!name || !address) return;
+
+            appState.customers.unshift({
+                id: 'c-' + Date.now(),
+                type,
+                name,
+                specialty,
+                phone,
+                address
+            });
+
+            document.getElementById('custName').value = '';
+            document.getElementById('custSpecialty').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('custAddress').value = '';
+            closeNewCustomerModal();
+            await syncStateToCloud(`«${name}» به آرشیو مشتریان اضافه شد`);
+        };
+
+        function renderCustomersList() {
+            const box = document.getElementById('customersListContainer');
+            if (!box) return;
+            const q = (document.getElementById('customerSearchInput')?.value || '').trim().toLowerCase();
+            const filtered = appState.customers.filter(c =>
+                !q || c.name.toLowerCase().includes(q) || c.specialty.toLowerCase().includes(q) || c.address.toLowerCase().includes(q)
+            );
+
+            box.innerHTML = filtered.map(c => `
+                <div class="pv-card p-3.5 flex items-center justify-between gap-2">
+                    <div class="space-y-0.5">
+                        <div class="text-sm font-extrabold">${c.type === 'داروخانه' ? '💊' : '🩺'} ${c.name}</div>
+                        <div class="text-[11px] font-bold" style="color: var(--accent);">${c.specialty}</div>
+                        <div class="text-[11px] pv-muted">📍 ${c.address}</div>
+                        <div class="text-[10px] pv-muted">☎️ ${c.phone}</div>
+                    </div>
+                    <button type="button" onclick="quickScheduleCustomer('${c.id}')" class="pv-soft-badge px-3 py-2 rounded-xl text-xs font-extrabold cursor-pointer shrink-0">
+                        + ویزیت
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.quickScheduleCustomer = async function (custId) {
+            const c = appState.customers.find(item => item.id === custId);
+            if (!c) return;
+            const randomNum = String(Math.floor(586000 + Math.random() * 9000));
+            appState.visits.unshift({
+                id: 'v-' + Date.now(),
+                visitNumber: toPersianDigits(randomNum),
+                date: document.getElementById('visitDateInput')?.value || '۱۴۰۵/۰۸/۳۰',
+                customerType: c.type,
+                customerName: c.name,
+                address: c.address,
+                product: 'ویواکیدز امگا ۳',
+                note: '',
+                planTag: 'پلن شده',
+                status: 'در انتظار ثبت ویزیت',
+                timingMode: 'ontime',
+                entryTime: null,
+                exitTime: null,
+                repUsername: currentUser ? currentUser.username : 'admin',
+                expanded: true
+            });
+            switchAppTab('visits');
+            await syncStateToCloud(`ویزیت برای ${c.name} ایجاد شد`);
+        };
+
+        // Reports View
+        function renderReportsView() {
+            const box = document.getElementById('reportsContainer');
+            if (!box) return;
+            const total = appState.visits.length;
+            const approved = appState.visits.filter(v => v.status === 'تایید شده').length;
+            const pending = appState.visits.filter(v => v.status === 'در انتظار تکمیل' || v.status === 'در انتظار ثبت ویزیت').length;
+            const failed = appState.visits.filter(v => v.status === 'ناموفق' || v.status === 'منقضی / رد شده').length;
+
+            box.innerHTML = `
+                <div class="pv-card p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold">خلاصه عملکرد کل تیم در Firebase</span>
+                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full pv-soft-badge">زنده</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 text-center text-xs">
+                        <div class="pv-subtle p-3 rounded-2xl">
+                            <div class="text-lg font-extrabold">${toPersianDigits(total)}</div>
+                            <div class="pv-muted mt-0.5">کل ویزیت‌ها</div>
+                        </div>
+                        <div class="pv-subtle p-3 rounded-2xl">
+                            <div class="text-lg font-extrabold text-emerald-600">${toPersianDigits(approved)}</div>
+                            <div class="pv-muted mt-0.5">تایید شده</div>
+                        </div>
+                        <div class="pv-subtle p-3 rounded-2xl">
+                            <div class="text-lg font-extrabold text-amber-600">${toPersianDigits(pending)}</div>
+                            <div class="pv-muted mt-0.5">در انتظار ثبت/تکمیل</div>
+                        </div>
+                        <div class="pv-subtle p-3 rounded-2xl">
+                            <div class="text-lg font-extrabold text-rose-600">${toPersianDigits(failed)}</div>
+                            <div class="pv-muted mt-0.5">ناموفق / رد شده</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pv-card p-4 space-y-2.5">
+                    <div class="text-xs font-extrabold">عملکرد به تفکیک کاربران تعریف‌شده:</div>
+                    ${appState.users.map(u => {
+                        const uVisits = appState.visits.filter(v => (v.repUsername || 'admin') === u.username);
+                        const uDone = uVisits.filter(v => v.status === 'تایید شده').length;
+                        return `
+                            <div class="pv-subtle p-3 rounded-xl flex items-center justify-between text-xs">
+                                <div>
+                                    <div class="font-bold">${u.fullName}</div>
+                                    <div class="text-[10px] pv-muted">${u.role}</div>
+                                </div>
+                                <div class="text-left font-extrabold" style="color: var(--accent);">
+                                    ${toPersianDigits(uDone)} / ${toPersianDigits(uVisits.length)} ویزیت
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // Generic Info Modal & Navigation
+        window.openInfoModal = function (title, body) {
+            document.getElementById('infoModalTitle').innerText = title;
+            document.getElementById('infoModalBody').innerText = body;
+            document.getElementById('infoModal').classList.remove('hidden');
+        };
+
+        window.closeInfoModal = function () {
+            document.getElementById('infoModal').classList.add('hidden');
+        };
+
+        window.manualCloudSync = async function () {
+            await syncStateToCloud('همگام‌سازی مجدد با Firebase انجام شد');
+        };
+
+        window.handleBackAction = function () {
+            if (activeAppTab !== 'home') {
+                switchAppTab('home');
+            } else {
+                showToast('در صفحه اصلی نووآ هستید', '🏠');
+            }
+        };
+
+        function refreshAllViews() {
+            renderDashboardStats();
+            renderVisitsList();
+            renderCustomersList();
+            renderReportsView();
+        }
+
+        // Boot Sequence
+        window.addEventListener('DOMContentLoaded', async () => {
+            applySavedTheme();
+            refreshCaptcha();
+            updateTimeGreeting();
+
+            if (currentUser) {
+                enterMainApp();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+
+            await initFirebaseCloud();
+        });
+    </script>
+</body>
+</html>
