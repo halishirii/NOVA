@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA | نووآ - سامانه هوشمند مدیریت ویزیت</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f3f6fb;
+            --bg-card: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent: #1d63ed;
+            --accent-hover: #1550c7;
+            --accent-soft: #e8f0fe;
+            --accent-text: #1d63ed;
+            --ring-color: #1d63ed;
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0b1120;
+            --bg-card: #131c31;
+            --bg-subtle: #1e293b;
+            --text-primary: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #26334d;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-soft: rgba(59, 130, 246, 0.16);
+            --accent-text: #93c5fd;
+            --ring-color: #3b82f6;
+        }
+
+        [data-theme="blue"] {
+            --bg-main: #0a192f;
+            --bg-card: #112240;
+            --bg-subtle: #1d3557;
+            --text-primary: #e6f1ff;
+            --text-muted: #8892b0;
+            --border-color: #233554;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --accent-soft: rgba(56, 189, 248, 0.16);
+            --accent-text: #7dd3fc;
+            --ring-color: #38bdf8;
+        }
+
+        [data-theme="pink"] {
+            --bg-main: #fdf2f8;
+            --bg-card: #ffffff;
+            --bg-subtle: #fce7f3;
+            --text-primary: #1f121b;
+            --text-muted: #705265;
+            --border-color: #fbcfe8;
+            --accent: #db2777;
+            --accent-hover: #be185d;
+            --accent-soft: #fce7f3;
+            --accent-text: #be185d;
+            --ring-color: #db2777;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            overflow-x: hidden;
+        }
+
+        .pv-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.06);
+        }
+
+        .pv-subtle {
+            background-color: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+        }
+
+        .pv-muted {
+            color: var(--text-muted);
+        }
+
+        .pv-btn-primary {
+            background-color: var(--accent);
+            color: #ffffff;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        [data-theme="blue"] .pv-btn-primary {
+            color: #081226;
+        }
+
+        .pv-btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .pv-icon-tile {
+            background-color: var(--accent);
+            color: #ffffff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        [data-theme="blue"] .pv-icon-tile {
+            color: #081226;
+        }
+
+        .pv-soft-badge {
+            background-color: var(--accent-soft);
+            color: var(--accent-text);
+        }
+
+        .pv-input {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+        }
+
+        .pv-input:focus {
+            outline: none;
+            border-color: var(--ring-color);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .nova-wordmark {
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            background: linear-gradient(135deg, #0f294a 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        [data-theme="dark"] .nova-wordmark,
+        [data-theme="blue"] .nova-wordmark {
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen select-none">
+
+    <!-- Toast Banner -->
+    <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] transition-all duration-300 opacity-0 pointer-events-none w-[92%] max-w-sm">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between gap-2 text-xs font-medium border border-slate-700">
+            <div class="flex items-center gap-2">
+                <span id="toastIcon" class="text-base">✨</span>
+                <span id="toastText">پیام سیستم</span>
+            </div>
+            <button onclick="hideToast()" class="text-slate-400 hover:text-white text-sm px-1 cursor-pointer">✕</button>
+        </div>
+    </div>
+
+    <div id="appShell" class="max-w-md mx-auto min-h-screen relative flex flex-col">
+
+        <!-- ========================================================= -->
+        <!-- 1. LOGIN SCREEN (Clean: No quick-fill, No password hint)  -->
+        <!-- ========================================================= -->
+        <section id="loginScreen" class="min-h-screen flex flex-col justify-between p-4 relative">
+            <div class="flex justify-between items-center pt-1 gap-2">
+                <div class="pv-card px-3 py-2 text-[11px] font-bold flex items-center gap-1.5">
+                    <span id="backendStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="backendStatusLabel">در حال بررسی بکند...</span>
+                </div>
+
+                <button onclick="openThemeSheet()" title="انتخاب تم" aria-label="انتخاب تم"
+                    class="w-12 h-12 pv-card rounded-2xl flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition">
+                    <svg class="w-6 h-6" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="pv-card p-6 my-auto space-y-5">
+                <div class="flex flex-col items-center text-center space-y-1">
+                    <div class="flex items-center justify-center gap-2" dir="ltr">
+                        <svg class="w-9 h-9" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="12" fill="var(--accent)" />
+                            <path d="M11 28V12L21 28V12" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M27 12L31 28L23 28L27 12Z" fill="#f59e0b" />
+                        </svg>
+                        <div class="flex flex-col items-center leading-none">
+                            <span class="text-3xl nova-wordmark">NOVA</span>
+                            <span class="text-[9px] font-extrabold tracking-[0.35em] pv-muted mt-0.5">ARCHIVE • نووآ</span>
+                        </div>
+                    </div>
+                    <h1 class="text-base font-extrabold pt-2" style="color: var(--accent);">
+                        نووآ؛ طراحی نو، تفکری برتر
+                    </h1>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3.5">
+                    <div>
+                        <input type="text" id="loginUsername" required placeholder="نام کاربری"
+                            class="w-full pv-input px-4 py-3.5 text-sm font-medium text-right" autocomplete="username">
+                    </div>
+
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required placeholder="رمز عبور"
+                            class="w-full pv-input pl-11 pr-4 py-3.5 text-sm font-medium text-right" autocomplete="current-password">
+                        <button type="button" onclick="togglePasswordVisibility()"
+                            class="absolute left-3.5 top-1/2 -translate-y-1/2 pv-muted hover:opacity-80 cursor-pointer" title="نمایش/مخفی کردن رمز">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div>
+                        <input type="text" id="loginCaptchaInput" required placeholder="عبارت امنیتی را وارد کنید"
+                            class="w-full pv-input px-4 py-3.5 text-sm font-medium text-right" maxlength="6">
+                    </div>
+
+                    <div class="flex items-center justify-center gap-3 pt-1" dir="ltr">
+                        <button type="button" onclick="refreshCaptcha()" title="تغییر کد امنیتی"
+                            class="w-11 h-11 pv-btn-primary rounded-xl flex items-center justify-center shadow-sm cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                        <div class="pv-subtle px-6 py-2.5 rounded-xl flex items-center justify-center min-w-[144px]">
+                            <span id="captchaDisplay" class="text-xl font-extrabold tracking-[0.28em] line-through decoration-2" style="color: var(--text-primary);">----</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full pv-btn-primary py-3.5 rounded-2xl font-bold text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer mt-2">
+                        <span>ورود</span>
+                        <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Backend Endpoint Configurator -->
+                <div class="pt-3 border-t space-y-1.5" style="border-color: var(--border-color);">
+                    <label class="block text-[10px] font-bold pv-muted">آدرس سرور بکند (API URL)</label>
+                    <input type="text" id="backendUrlInput" onchange="updateBackendUrl(this.value)" placeholder="http://localhost:4000"
+                        class="w-full pv-input px-3 py-2 text-[11px] text-left" dir="ltr">
+                </div>
+            </div>
+
+            <div class="text-center text-[11px] pv-muted pb-2">
+                احراز هویت امن از طریق سرور بکند • نووآ (NOVA)
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- 2. AUTHENTICATED MAIN APP SHELL                           -->
+        <!-- ========================================================= -->
+        <section id="mainAppScreen" class="hidden min-h-screen flex-col pb-28">
+            <header class="px-4 pt-4 pb-3 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md" style="background-color: color-mix(in srgb, var(--bg-main) 88%, transparent);">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full p-0.5 flex items-center justify-center font-extrabold text-base text-white shadow-sm shrink-0"
+                        style="background: linear-gradient(135deg, var(--accent), #0ea5e9);" id="headerUserAvatar">
+                        ن
+                    </div>
+                    <div class="text-right">
+                        <div id="headerGreeting" class="text-xs font-medium flex items-center gap-1 pv-muted">
+                            <span>خوش آمدید</span>
+                        </div>
+                        <div id="headerUserName" class="text-sm font-extrabold">کاربر نووآ</div>
+                        <div class="mt-0.5">
+                            <span id="headerBackendBadge" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full pv-soft-badge">
+                                <span id="headerBackendDot" class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                <span id="headerBackendText">در حال اتصال...</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="openThemeSheet()" title="انتخاب تم" aria-label="انتخاب تم"
+                        class="w-11 h-11 pv-card rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-85 transition">
+                        <svg class="w-5 h-5" style="color: var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                    </button>
+
+                    <button onclick="handleLogout()" title="خروج از حساب" aria-label="خروج از حساب"
+                        class="w-11 h-11 pv-card rounded-2xl flex items-center justify-center cursor-pointer hover:opacity-85 transition">
+                        <svg class="w-5 h-5" style="color: var(--text-primary);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- TAB 1: HOME -->
+            <div id="tabHome" class="px-4 space-y-4">
+                <div class="pv-card p-4 space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm font-extrabold">برنامه امروز ۳۰ آبان</h2>
+                        <span id="homeProgressBadge" class="text-[11px] font-bold px-3 py-1 rounded-full pv-soft-badge">۰ از ۰ انجام شد</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2.5 text-center">
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statTotalVisits" class="text-lg font-extrabold">۰</div>
+                            <div class="text-[11px] pv-muted mt-0.5">ویزیت امروز</div>
+                        </div>
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statCompletedVisits" class="text-lg font-extrabold">۰</div>
+                            <div class="text-[11px] pv-muted mt-0.5">انجام شده</div>
+                        </div>
+                        <div class="pv-subtle rounded-2xl py-3 px-2">
+                            <div id="statPendingVisits" class="text-lg font-extrabold">۰</div>
+                            <div class="text-[11px] pv-muted mt-0.5 leading-tight">در انتظار تکمیل</div>
+                        </div>
+                    </div>
+
+                    <div class="w-full h-2 rounded-full overflow-hidden" style="background-color: var(--bg-subtle);">
+                        <div id="homeProgressBar" class="h-full rounded-full transition-all duration-300" style="width: 0%; background-color: var(--accent);"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-4 gap-2.5">
+                    <button onclick="switchAppTab('customers')" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">مشتری</span>
+                    </button>
+
+                    <button onclick="switchAppTab('visits')" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">ویزیت</span>
+                    </button>
+
+                    <button onclick="switchAppTab('reports')" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">گزارش</span>
+                    </button>
+
+                    <button onclick="openAccountManagerModal()" class="pv-card py-4 px-2 flex flex-col items-center justify-center gap-2 cursor-pointer">
+                        <div class="pv-icon-tile w-11 h-11">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        <span class="text-xs font-extrabold">کاربران</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: VISITS -->
+            <div id="tabVisits" class="hidden px-4 space-y-3.5">
+                <div class="flex items-center justify-between gap-2">
+                    <button onclick="openNewVisitModal()" class="pv-btn-primary py-3 px-4 rounded-2xl text-xs font-extrabold cursor-pointer">
+                        + ویزیت جدید
+                    </button>
+                    <span id="visitsCountText" class="text-xs font-bold pv-muted">تعداد ویزیت : ۰</span>
+                </div>
+                <div id="visitsListContainer" class="space-y-3"></div>
+            </div>
+
+            <!-- TAB 3: CUSTOMERS -->
+            <div id="tabCustomers" class="hidden px-4 space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-extrabold">لیست مشتریان</h2>
+                    <button onclick="openNewCustomerModal()" class="pv-btn-primary px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer">
+                        + مشتری جدید
+                    </button>
+                </div>
+                <div id="customersListContainer" class="space-y-2.5"></div>
+            </div>
+
+            <!-- TAB 4: REPORTS -->
+            <div id="tabReports" class="hidden px-4 space-y-3.5">
+                <h2 class="text-sm font-extrabold">گزارش عملکرد</h2>
+                <div id="reportsContainer" class="pv-card p-4 text-xs space-y-2"></div>
+            </div>
+
+            <!-- BOTTOM NAV -->
+            <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40 px-2 pb-2 pt-1.5 backdrop-blur-md" style="background-color: color-mix(in srgb, var(--bg-card) 92%, transparent); border-top: 1px solid var(--border-color);">
+                <div class="flex items-center justify-around">
+                    <button onclick="switchAppTab('home')" class="px-3 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-btn-primary">
+                        <span class="text-[11px] font-bold">خانه</span>
+                    </button>
+                    <button onclick="switchAppTab('visits')" class="px-3 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-muted">
+                        <span class="text-[11px] font-bold">ویزیت</span>
+                    </button>
+                    <button onclick="switchAppTab('customers')" class="px-3 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-muted">
+                        <span class="text-[11px] font-bold">مشتری</span>
+                    </button>
+                    <button onclick="syncWithBackend(true)" class="px-3 py-2 rounded-2xl flex flex-col items-center gap-0.5 cursor-pointer pv-muted">
+                        <span class="text-[11px] font-bold">رفرش</span>
+                    </button>
+                </div>
+            </nav>
+        </section>
+    </div>
+
+    <!-- THEME BOTTOM SHEET -->
+    <div id="themeSheetOverlay" onclick="closeThemeSheet()" class="fixed inset-0 bg-black/45 z-[60] hidden flex items-end justify-center">
+        <div onclick="event.stopPropagation()" class="w-full max-w-md pv-card rounded-t-[28px] rounded-b-none p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-extrabold">انتخاب تم</h3>
+                <button onclick="closeThemeSheet()" class="pv-muted cursor-pointer">✕</button>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" onclick="selectTheme('light')" class="p-3.5 rounded-2xl pv-subtle font-bold text-xs cursor-pointer">روشن (Light)</button>
+                <button type="button" onclick="selectTheme('dark')" class="p-3.5 rounded-2xl pv-subtle font-bold text-xs cursor-pointer">تیره (Dark)</button>
+                <button type="button" onclick="selectTheme('pink')" class="p-3.5 rounded-2xl pv-subtle font-bold text-xs cursor-pointer">صورتی (Pink)</button>
+                <button type="button" onclick="selectTheme('blue')" class="p-3.5 rounded-2xl pv-subtle font-bold text-xs cursor-pointer">آبی (Blue)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN USERS MODAL -->
+    <div id="accountModal" class="fixed inset-0 bg-black/50 z-[70] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-md pv-card p-5 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                <h3 class="text-sm font-extrabold">مدیریت کاربران (بکند امن)</h3>
+                <button onclick="closeAccountManagerModal()" class="pv-muted cursor-pointer">✕</button>
+            </div>
+            <form onsubmit="handleCreateUserAccount(event)" class="space-y-2.5 text-xs">
+                <input type="text" id="newAccFullName" required placeholder="نام و نام خانوادگی" class="w-full pv-input px-3 py-2.5">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="newAccUsername" required placeholder="نام کاربری" class="pv-input px-3 py-2.5">
+                    <input type="password" id="newAccPassword" required placeholder="رمز عبور" class="pv-input px-3 py-2.5">
+                </div>
+                <select id="newAccRole" class="w-full pv-input px-3 py-2.5">
+                    <option value="rep">نماینده علمی</option>
+                    <option value="admin">مدیر سیستم</option>
+                </select>
+                <button type="submit" class="w-full pv-btn-primary py-2.5 rounded-xl font-extrabold cursor-pointer">ثبت کاربر در بکند</button>
+            </form>
+            <div id="accountsListBox" class="space-y-2 max-h-44 overflow-y-auto text-xs"></div>
+        </div>
+    </div>
+
+    <!-- NEW VISIT MODAL -->
+    <div id="newVisitModal" class="fixed inset-0 bg-black/50 z-[70] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-md pv-card p-5 space-y-3">
+            <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
+                <h3 class="text-sm font-extrabold">ویزیت جدید</h3>
+                <button onclick="closeNewVisitModal()" class="pv-muted cursor-pointer">✕</button>
+            </div>
+            <form onsubmit="handleAddNewVisit(event)" class="space-y-2.5 text-xs">
+                <input type="text" id="visitCustomerName" required placeholder="نام پزشک یا داروخانه" class="w-full pv-input px-3 py-2.5">
+                <input type="text" id="visitAddress" required placeholder="آدرس" class="w-full pv-input px-3 py-2.5">
+                <input type="text" id="visitProduct" placeholder="محصول پروموت‌شده" class="w-full pv-input px-3 py-2.5">
+                <button type="submit" class="w-full pv-btn-primary py-2.5 rounded-xl font-extrabold cursor-pointer">ثبت ویزیت</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NEW CUSTOMER MODAL -->
+    <div id="newCustomerModal" class="fixed inset-0 bg-black/50 z-[70] hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-md pv-card p-5 space-y-3">
+            <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border-color);">
+                <h3 class="text-sm font-extrabold">مشتری جدید</h3>
+                <button onclick="closeNewCustomerModal()" class="pv-muted cursor-pointer">✕</button>
+            </div>
+            <form onsubmit="handleAddCustomer(event)" class="space-y-2.5 text-xs">
+                <input type="text" id="custName" required placeholder="نام مشتری" class="w-full pv-input px-3 py-2.5">
+                <input type="text" id="custSpecialty" placeholder="تخصص" class="w-full pv-input px-3 py-2.5">
+                <input type="text" id="custAddress" required placeholder="آدرس" class="w-full pv-input px-3 py-2.5">
+                <button type="submit" class="w-full pv-btn-primary py-2.5 rounded-xl font-extrabold cursor-pointer">ذخیره مشتری</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const TOKEN_KEY = 'nova_auth_jwt_v1';
+        const API_URL_KEY = 'nova_backend_api_url_v1';
+        const THEME_KEY = 'nova_theme_v1';
+        const CACHE_KEY = 'nova_workspace_cache_v1';
+
+        let captchaToken = '';
+        let currentUser = null;
+        let stateData = { customers: [], visits: [], users: [] };
+
+        function getApiUrl() {
+            return (localStorage.getItem(API_URL_KEY) || 'http://localhost:4000').replace(/\/+$/, '');
+        }
+
+        window.updateBackendUrl = function (val) {
+            const clean = (val || '').trim().replace(/\/+$/, '') || 'http://localhost:4000';
+            localStorage.setItem(API_URL_KEY, clean);
+            loadCaptcha();
+        };
+
+        function showToast(text, icon = '✨') {
+            const el = document.getElementById('toastBanner');
+            document.getElementById('toastText').textContent = text;
+            document.getElementById('toastIcon').textContent = icon;
+            el.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => el.classList.add('opacity-0', 'pointer-events-none'), 2600);
+        }
+
+        window.hideToast = () => document.getElementById('toastBanner').classList.add('opacity-0', 'pointer-events-none');
+
+        function setBackendBadge(online) {
+            const dot = document.getElementById('backendStatusDot');
+            const label = document.getElementById('backendStatusLabel');
+            const hDot = document.getElementById('headerBackendDot');
+            const hText = document.getElementById('headerBackendText');
+            if (online) {
+                if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                if (label) label.textContent = 'متصل به بکند امن';
+                if (hDot) hDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+                if (hText) hText.textContent = 'بکند متصل';
+            } else {
+                if (dot) dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+                if (label) label.textContent = 'بکند در دسترس نیست';
+                if (hDot) hDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400';
+                if (hText) hText.textContent = 'کش محلی';
+            }
+        }
+
+        window.refreshCaptcha = async function loadCaptcha() {
+            try {
+                const res = await fetch(`${getApiUrl()}/api/auth/captcha`);
+                const data = await res.json();
+                if (data.ok) {
+                    document.getElementById('captchaDisplay').textContent = data.code;
+                    captchaToken = data.captchaToken;
+                    setBackendBadge(true);
+                    return;
+                }
+            } catch {}
+            setBackendBadge(false);
+        };
+
+        window.togglePasswordVisibility = function () {
+            const inp = document.getElementById('loginPassword');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+        };
+
+        window.handleLoginSubmit = async function (e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const captchaInput = document.getElementById('loginCaptchaInput').value.trim();
+
+            try {
+                const res = await fetch(`${getApiUrl()}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, captchaInput, captchaToken })
+                });
+                const data = await res.json();
+                if (!data.ok) {
+                    showToast(data.message || 'خطا در ورود', '⚠️');
+                    document.getElementById('loginCaptchaInput').value = '';
+                    refreshCaptcha();
+                    return;
+                }
+                localStorage.setItem(TOKEN_KEY, data.token);
+                currentUser = data.user;
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginCaptchaInput').value = '';
+                enterApp();
+                await syncWithBackend(true);
+            } catch {
+                showToast('ارتباط با سرور بکند برقرار نشد', '❌');
+            }
+        };
+
+        window.handleLogout = function () {
+            localStorage.removeItem(TOKEN_KEY);
+            currentUser = null;
+            document.getElementById('mainAppScreen').classList.add('hidden');
+            document.getElementById('mainAppScreen').classList.remove('flex');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            refreshCaptcha();
+        };
+
+        function enterApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainAppScreen').classList.remove('hidden');
+            document.getElementById('mainAppScreen').classList.add('flex');
+            if (currentUser) {
+                document.getElementById('headerUserName').textContent = currentUser.fullName;
+                document.getElementById('headerUserAvatar').textContent = currentUser.fullName.charAt(0) || 'ن';
+            }
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    stateData.customers = parsed.customers || [];
+                    stateData.visits = parsed.visits || [];
+                } catch {}
+            }
+            renderAll();
+        }
+
+        window.syncWithBackend = async function (showMessage = false) {
+            const token = localStorage.getItem(TOKEN_KEY);
+            if (!token) return;
+            try {
+                const res = await fetch(`${getApiUrl()}/api/workspace/state`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (res.status === 401) {
+                    handleLogout();
+                    return;
+                }
+                const data = await res.json();
+                if (data.ok) {
+                    stateData.customers = data.customers || [];
+                    stateData.visits = data.visits || [];
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({ customers: stateData.customers, visits: stateData.visits }));
+                    setBackendBadge(true);
+                    renderAll();
+                    if (showMessage) showToast('همگام‌سازی با بکند انجام شد', '✅');
+                }
+            } catch {
+                setBackendBadge(false);
+            }
+        };
+
+        async function pushWorkspaceState() {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ customers: stateData.customers, visits: stateData.visits }));
+            renderAll();
+            const token = localStorage.getItem(TOKEN_KEY);
+            if (!token) return;
+            try {
+                await fetch(`${getApiUrl()}/api/workspace/state`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ customers: stateData.customers, visits: stateData.visits })
+                });
+                setBackendBadge(true);
+            } catch {
+                setBackendBadge(false);
+            }
+        }
+
+        window.openThemeSheet = () => document.getElementById('themeSheetOverlay').classList.remove('hidden');
+        window.closeThemeSheet = () => document.getElementById('themeSheetOverlay').classList.add('hidden');
+        window.selectTheme = function (theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem(THEME_KEY, theme);
+            closeThemeSheet();
+        };
+
+        window.switchAppTab = function (tab) {
+            ['home', 'visits', 'customers', 'reports'].forEach(t => {
+                document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
+            });
+            renderAll();
+        };
+
+        window.openNewVisitModal = () => document.getElementById('newVisitModal').classList.remove('hidden');
+        window.closeNewVisitModal = () => document.getElementById('newVisitModal').classList.add('hidden');
+
+        window.handleAddNewVisit = async function (e) {
+            e.preventDefault();
+            const customerName = document.getElementById('visitCustomerName').value.trim();
+            const address = document.getElementById('visitAddress').value.trim();
+            const product = document.getElementById('visitProduct').value.trim() || 'ویواکیدز';
+            stateData.visits.unshift({
+                id: 'v-' + Date.now(),
+                customerName,
+                address,
+                product,
+                status: 'در انتظار ثبت ویزیت'
+            });
+            document.getElementById('visitCustomerName').value = '';
+            document.getElementById('visitAddress').value = '';
+            document.getElementById('visitProduct').value = '';
+            closeNewVisitModal();
+            await pushWorkspaceState();
+            showToast('ویزیت ثبت شد', '✅');
+        };
+
+        window.completeVisit = async function (id) {
+            const v = stateData.visits.find(item => item.id === id);
+            if (!v) return;
+            v.status = 'تایید شده';
+            await pushWorkspaceState();
+        };
+
+        window.openNewCustomerModal = () => document.getElementById('newCustomerModal').classList.remove('hidden');
+        window.closeNewCustomerModal = () => document.getElementById('newCustomerModal').classList.add('hidden');
+
+        window.handleAddCustomer = async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('custName').value.trim();
+            const specialty = document.getElementById('custSpecialty').value.trim() || 'پزشک';
+            const address = document.getElementById('custAddress').value.trim();
+            stateData.customers.unshift({ id: 'c-' + Date.now(), name, specialty, address });
+            document.getElementById('custName').value = '';
+            document.getElementById('custSpecialty').value = '';
+            document.getElementById('custAddress').value = '';
+            closeNewCustomerModal();
+            await pushWorkspaceState();
+            showToast('مشتری ذخیره شد', '✅');
+        };
+
+        window.openAccountManagerModal = async function () {
+            document.getElementById('accountModal').classList.remove('hidden');
+            const token = localStorage.getItem(TOKEN_KEY);
+            try {
+                const res = await fetch(`${getApiUrl()}/api/auth/users`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.ok && Array.isArray(data.users)) {
+                    document.getElementById('accountsListBox').innerHTML = data.users.map(u => `
+                        <div class="pv-subtle p-2.5 rounded-xl flex justify-between items-center">
+                            <span><b>${u.fullName}</b> (${u.username})</span>
+                            <span class="pv-muted">${u.roleLabel}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('accountsListBox').innerHTML = '<div class="pv-muted">فقط مدیر سیستم می‌تواند کاربران را مشاهده یا ثبت کند.</div>';
+                }
+            } catch {}
+        };
+
+        window.closeAccountManagerModal = () => document.getElementById('accountModal').classList.add('hidden');
+
+        window.handleCreateUserAccount = async function (e) {
+            e.preventDefault();
+            const token = localStorage.getItem(TOKEN_KEY);
+            const fullName = document.getElementById('newAccFullName').value.trim();
+            const username = document.getElementById('newAccUsername').value.trim();
+            const password = document.getElementById('newAccPassword').value;
+            const role = document.getElementById('newAccRole').value;
+            try {
+                const res = await fetch(`${getApiUrl()}/api/auth/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ fullName, username, password, role })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    document.getElementById('newAccFullName').value = '';
+                    document.getElementById('newAccUsername').value = '';
+                    document.getElementById('newAccPassword').value = '';
+                    showToast('کاربر جدید ثبت شد', '✅');
+                    openAccountManagerModal();
+                } else {
+                    showToast(data.message || 'خطا در ثبت کاربر', '⚠️');
+                }
+            } catch {
+                showToast('خطای ارتباط با سرور', '❌');
+            }
+        };
+
+        function renderAll() {
+            const total = stateData.visits.length;
+            const done = stateData.visits.filter(v => v.status === 'تایید شده').length;
+            const pending = total - done;
+            document.getElementById('statTotalVisits').textContent = total;
+            document.getElementById('statCompletedVisits').textContent = done;
+            document.getElementById('statPendingVisits').textContent = pending;
+            document.getElementById('homeProgressBadge').textContent = `${done} از ${total} انجام شد`;
+            document.getElementById('homeProgressBar').style.width = total ? `${Math.round((done / total) * 100)}%` : '0%';
+            document.getElementById('visitsCountText').textContent = `تعداد ویزیت : ${total}`;
+
+            document.getElementById('visitsListContainer').innerHTML = stateData.visits.map(v => `
+                <div class="pv-card p-3.5 flex items-center justify-between gap-2 text-xs">
+                    <div>
+                        <div class="font-extrabold text-sm">${v.customerName}</div>
+                        <div class="pv-muted mt-0.5">${v.address}</div>
+                        <div class="mt-1 font-bold" style="color: var(--accent);">${v.status}</div>
+                    </div>
+                    ${v.status !== 'تایید شده' ? `
+                        <button onclick="completeVisit('${v.id}')" class="pv-btn-primary px-3 py-2 rounded-xl font-bold cursor-pointer">تایید</button>
+                    ` : `<span class="text-emerald-600 font-bold">✓ انجام شد</span>`}
+                </div>
+            `).join('') || '<div class="pv-card p-5 text-center text-xs pv-muted">هنوز ویزیتی ثبت نشده است.</div>';
+
+            document.getElementById('customersListContainer').innerHTML = stateData.customers.map(c => `
+                <div class="pv-card p-3.5 text-xs space-y-1">
+                    <div class="font-extrabold text-sm">${c.name}</div>
+                    <div class="font-bold" style="color: var(--accent);">${c.specialty}</div>
+                    <div class="pv-muted">${c.address}</div>
+                </div>
+            `).join('') || '<div class="pv-card p-5 text-center text-xs pv-muted">مشتری ثبت نشده است.</div>';
+
+            document.getElementById('reportsContainer').innerHTML = `
+                <div>تعداد کل ویزیت‌ها: <b>${total}</b></div>
+                <div>تایید شده: <b>${done}</b></div>
+                <div>در انتظار: <b>${pending}</b></div>
+                <div>تعداد مشتریان: <b>${stateData.customers.length}</b></div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.documentElement.setAttribute('data-theme', localStorage.getItem(THEME_KEY) || 'light');
+            document.getElementById('backendUrlInput').value = getApiUrl();
+            await refreshCaptcha();
+
+            const savedToken = localStorage.getItem(TOKEN_KEY);
+            if (savedToken) {
+                try {
+                    const res = await fetch(`${getApiUrl()}/api/auth/me`, {
+                        headers: { Authorization: `Bearer ${savedToken}` }
+                    });
+                    const data = await res.json();
+                    if (data.ok && data.user) {
+                        currentUser = data.user;
+                        enterApp();
+                        await syncWithBackend(false);
+                        return;
+                    }
+                } catch {}
+                localStorage.removeItem(TOKEN_KEY);
+            }
+        });
+    </script>
+</body>
+</html>
