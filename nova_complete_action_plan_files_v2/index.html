@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دستیار کامل اکشن‌پلن و مدیریت پزشکان</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Vazirmatn', Tahoma, sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="min-h-screen antialiased">
+  <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3.5">
+      <div>
+        <h1 class="text-base font-bold text-slate-900 sm:text-lg">دستیار اکشن‌پلن ویزیت پزشکان — نسخه کامل (آپلود، تولید پلن، لوکال و سرور)</h1>
+        <p id="activeUserBanner" class="text-xs text-slate-500">حالت فعلی: تست لوکال بدون نیاز به سرور | کاربر: مهمان</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <select id="connectionProfileSelect" onchange="switchConnectionProfile(this.value)" class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800">
+          <option value="local_mock">۱. تست لوکال (بدون سرور)</option>
+          <option value="local_api">۲. لوکال به API لوکال (127.0.0.1:8000)</option>
+          <option value="vps_public">۳. سرور عمومی VPS (IP / دامنه)</option>
+          <option value="vps_vpn">۴. سرور با VPN / شبکه اختصاصی</option>
+        </select>
+        <button onclick="openAuthModal()" id="authStatusBtn" class="rounded-xl bg-teal-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-teal-700">
+          ورود کاربر
+        </button>
+        <button onclick="openVaultModal()" class="rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2 text-xs font-semibold text-amber-950 hover:bg-amber-100">
+          🔒 دیتابیس (HOSSEIN1994@)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl space-y-6 px-4 py-6">
+    <!-- Connection Array Bar -->
+    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-4 items-end">
+        <div>
+          <label class="mb-1 block text-xs font-medium text-slate-600">آدرس پایه سرور / API</label>
+          <input id="apiBaseUrlInput" type="text" dir="ltr" onchange="updateCustomEndpoint()" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs tabular-nums" />
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-slate-600">پروفایل اتصال</label>
+          <input id="activeProfileLabel" type="text" readonly class="w-full rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs text-slate-700" />
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="testConnectionHealth()" class="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+            تست اتصال
+          </button>
+          <span id="healthStatusText" class="text-xs text-slate-500">آماده</span>
+        </div>
+        <div class="text-left">
+          <span id="activeEndpointBadge" class="inline-block rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800 tabular-nums"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main 2-Column Workspace: Doctors Upload & List + Action Plan Generator -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <!-- Left / Right: Doctors Management & File Upload -->
+      <section class="lg:col-span-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 sm:text-base">۱. بانک پزشکان و آپلود فایل</h2>
+            <p class="text-xs text-slate-500">آپلود فایل CSV / TSV / TXT / JSON یا ثبت دستی پزشک</p>
+          </div>
+          <span id="doctorsCountBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 tabular-nums">۰ پزشک</span>
+        </div>
+
+        <!-- Upload File Box -->
+        <div class="rounded-xl border border-dashed border-teal-400 bg-teal-50/40 p-3.5 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label class="text-xs font-semibold text-teal-950">آپلود فایل پزشکان (CSV, TSV, TXT, JSON)</label>
+            <button type="button" onclick="downloadSampleCsv()" class="text-xs font-semibold text-teal-700 underline hover:text-teal-900">
+              دانلود فایل نمونه CSV
+            </button>
+          </div>
+          <input id="doctorFileInput" type="file" accept=".csv,.tsv,.txt,.json" onchange="handleDoctorFileUpload(event)" class="block w-full text-xs text-slate-700 file:ml-3 file:rounded-lg file:border-0 file:bg-teal-600 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-teal-700" />
+          <p id="uploadFeedback" class="text-xs text-slate-600"></p>
+        </div>
+
+        <!-- Manual Add Doctor Form -->
+        <form onsubmit="handleAddDoctor(event)" class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+          <input id="docNameInput" type="text" required placeholder="نام پزشک (مثلاً دکتر سارا کمالی)" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs" />
+          <input id="docCodeInput" type="text" required dir="ltr" placeholder="کد نظام پزشکی (مثلاً 54120)" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs tabular-nums" />
+          <input id="docSpecialtyInput" type="text" placeholder="تخصص (مثلاً فوق تخصص اطفال)" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs" />
+          <input id="docDistrictInput" type="text" placeholder="شهر / منطقه (مثلاً تهران - منطقه ۳)" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs" />
+          <input id="docScheduleInput" type="text" placeholder="ساعت حضور (مثلاً شنبه و دوشنبه ۱۶ تا ۲۰)" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs sm:col-span-2" />
+          <div class="flex items-center justify-between sm:col-span-2 pt-1">
+            <label class="flex items-center gap-2 text-xs font-medium text-slate-700">
+              <input id="docPriorityInput" type="checkbox" class="rounded border-slate-300 text-teal-600" />
+              اولویت بالا (ویزیت پرتکرار / کلیدی)
+            </label>
+            <button type="submit" class="rounded-xl bg-teal-600 px-4 py-2 text-xs font-semibold text-white hover:bg-teal-700">
+              + افزودن به لیست
+            </button>
+          </div>
+        </form>
+
+        <!-- Doctors Table -->
+        <div class="max-h-72 overflow-auto rounded-xl border border-slate-200">
+          <table class="min-w-full divide-y divide-slate-200 text-right text-xs">
+            <thead class="sticky top-0 bg-slate-50 font-semibold text-slate-600">
+              <tr>
+                <th class="px-3 py-2">پزشک</th>
+                <th class="px-3 py-2">کد</th>
+                <th class="px-3 py-2">تخصص / منطقه</th>
+                <th class="px-3 py-2">اولویت</th>
+                <th class="px-3 py-2">حذف</th>
+              </tr>
+            </thead>
+            <tbody id="doctorsBody" class="divide-y divide-slate-100 bg-white"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Action Plan Generator -->
+      <section class="lg:col-span-6 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 sm:text-base">۲. تولید اکشن‌پلن ویزیت (تقویم شمسی)</h2>
+            <p class="text-xs text-slate-500">تولید برنامه ویزیت روزانه بر اساس پزشکان ثبت‌شده</p>
+          </div>
+          <button type="button" onclick="exportPlanCsv()" class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-800 hover:bg-slate-100">
+            خروجی CSV پلن
+          </button>
+        </div>
+
+        <form onsubmit="handleGenerateActionPlan(event)" class="grid grid-cols-1 gap-3 sm:grid-cols-2 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-700 mb-1">عنوان اکشن‌پلن</label>
+            <input id="planTitleInput" type="text" value="اکشن‌پلن ویزیت آذر ۱۴۰۵ — مناطق ۳ و ۴" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">تاریخ شروع (شمسی YYYY/MM/DD)</label>
+            <input id="planStartDateInput" type="text" dir="ltr" value="1405/09/01" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-xs tabular-nums" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">تعداد روزهای برنامه</label>
+            <input id="planDaysCountInput" type="number" min="1" max="60" value="14" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs tabular-nums" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">تعداد ویزیت در هر روز</label>
+            <input id="planDailyVisitsInput" type="number" min="1" max="30" value="3" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs tabular-nums" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">حداقل فاصله تکرار پزشک (روز)</label>
+            <input id="planMinGapInput" type="number" min="0" max="30" value="4" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs tabular-nums" />
+          </div>
+          <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3 pt-1">
+            <label class="flex items-center gap-2 text-xs font-medium text-slate-700">
+              <input id="skipFridayInput" type="checkbox" checked class="rounded border-slate-300 text-teal-600" />
+              عدم برنامه‌ریزی در روزهای جمعه
+            </label>
+            <button type="submit" class="rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-slate-800">
+              ⚡ تولید اکشن‌پلن
+            </button>
+          </div>
+        </form>
+
+        <div id="planSummaryBar" class="text-xs font-medium text-teal-900 bg-teal-50 rounded-xl px-3.5 py-2">
+          هنوز اکشن‌پلنی تولید نشده است.
+        </div>
+
+        <div class="max-h-72 overflow-auto rounded-xl border border-slate-200">
+          <table class="min-w-full divide-y divide-slate-200 text-right text-xs">
+            <thead class="sticky top-0 bg-slate-50 font-semibold text-slate-600">
+              <tr>
+                <th class="px-3 py-2">تاریخ</th>
+                <th class="px-3 py-2">روز</th>
+                <th class="px-3 py-2">نام پزشک</th>
+                <th class="px-3 py-2">کد</th>
+                <th class="px-3 py-2">منطقه / حضور</th>
+              </tr>
+            </thead>
+            <tbody id="planItemsBody" class="divide-y divide-slate-100 bg-white"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Audit Logs -->
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold text-slate-900 sm:text-base">۳. گزارش ورود، خروج و تغییرات کاربران (Audit Log)</h2>
+        <button onclick="refreshAuditLogs()" class="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+          بروزرسانی لاگ‌ها
+        </button>
+      </div>
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="min-w-full divide-y divide-slate-200 text-right text-xs">
+          <thead class="bg-slate-50 font-semibold text-slate-600">
+            <tr>
+              <th class="px-3 py-2">کاربر</th>
+              <th class="px-3 py-2">رویداد</th>
+              <th class="px-3 py-2">بخش</th>
+              <th class="px-3 py-2">جزئیات</th>
+              <th class="px-3 py-2">IP</th>
+              <th class="px-3 py-2">زمان</th>
+            </tr>
+          </thead>
+          <tbody id="auditLogsBody" class="divide-y divide-slate-100 bg-white"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Login Modal -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4">
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+      <h3 class="text-base font-bold text-slate-900 mb-3">ورود کاربر به سامانه</h3>
+      <form onsubmit="handleUserLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">نام کاربری</label>
+          <input id="loginUsername" type="text" value="hossein" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">رمز عبور</label>
+          <input id="loginPassword" type="password" value="HOSSEIN1994@" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeAuthModal()" class="rounded-xl border border-slate-200 px-4 py-2 text-xs">انصراف</button>
+          <button type="submit" class="rounded-xl bg-teal-600 px-4 py-2 text-xs font-semibold text-white hover:bg-teal-700">ورود</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Vault Modal -->
+  <div id="vaultModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4">
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+      <h3 class="text-base font-bold text-slate-900 mb-2">رمز ورود به دیتابیس</h3>
+      <p class="text-xs text-slate-500 mb-3">رمز پیش‌فرض: HOSSEIN1994@</p>
+      <form onsubmit="handleVaultUnlock(event)" class="space-y-3">
+        <input id="vaultPassInput" type="password" dir="ltr" placeholder="HOSSEIN1994@" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-left text-xs" />
+        <p id="vaultErr" class="hidden text-xs text-rose-600">رمز دیتابیس اشتباه است.</p>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeVaultModal()" class="rounded-xl border border-slate-200 px-4 py-2 text-xs">بستن</button>
+          <button type="submit" class="rounded-xl bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700">باز کردن دیتابیس</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const CONNECTION_ARRAY = {
+      local_mock: {
+        id: "local_mock",
+        label: "تست لوکال (بدون سرور)",
+        baseUrl: "local://mock-db",
+        endpoints: {
+          health: "/api/health",
+          login: "/api/auth/login",
+          logout: "/api/auth/logout",
+          unlockVault: "/api/vault/unlock",
+          doctors: "/api/doctors",
+          bulkDoctors: "/api/doctors/bulk",
+          plans: "/api/plans",
+          auditLogs: "/api/audit-logs"
+        }
+      },
+      local_api: {
+        id: "local_api",
+        label: "لوکال به API لوکال",
+        baseUrl: "http://127.0.0.1:8000",
+        endpoints: {
+          health: "/api/health",
+          login: "/api/auth/login",
+          logout: "/api/auth/logout",
+          unlockVault: "/api/vault/unlock",
+          doctors: "/api/doctors",
+          bulkDoctors: "/api/doctors/bulk",
+          plans: "/api/plans",
+          auditLogs: "/api/audit-logs"
+        }
+      },
+      vps_public: {
+        id: "vps_public",
+        label: "سرور عمومی VPS",
+        baseUrl: "http://YOUR_SERVER_IP:8000",
+        endpoints: {
+          health: "/api/health",
+          login: "/api/auth/login",
+          logout: "/api/auth/logout",
+          unlockVault: "/api/vault/unlock",
+          doctors: "/api/doctors",
+          bulkDoctors: "/api/doctors/bulk",
+          plans: "/api/plans",
+          auditLogs: "/api/audit-logs"
+        }
+      },
+      vps_vpn: {
+        id: "vps_vpn",
+        label: "سرور با VPN / شبکه اختصاصی",
+        baseUrl: "http://10.8.0.1:8000",
+        endpoints: {
+          health: "/api/health",
+          login: "/api/auth/login",
+          logout: "/api/auth/logout",
+          unlockVault: "/api/vault/unlock",
+          doctors: "/api/doctors",
+          bulkDoctors: "/api/doctors/bulk",
+          plans: "/api/plans",
+          auditLogs: "/api/audit-logs"
+        }
+      }
+    };
+
+    const PERSIAN_WEEKDAYS = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+
+    let currentProfileKey = "local_mock";
+    let authToken = null;
+    let currentUser = null;
+    let generatedPlanItems = [];
+
+    let mockDoctors = [
+      { name: "دکتر داود امیرکاشانی", medical_code: "48219", specialty: "فوق تخصص اطفال", city: "تهران", district: "منطقه ۳", schedule: "شنبه تا سه‌شنبه ۸ تا ۱۳", high_priority: 1 },
+      { name: "دکتر رزیتا حسینی", medical_code: "61904", specialty: "متخصص مغز و اعصاب", city: "تهران", district: "منطقه ۳", schedule: "یکشنبه و سه‌شنبه ۱۶ تا ۲۰", high_priority: 1 },
+      { name: "دکتر فرزانه روحانی", medical_code: "73412", specialty: "اعصاب و روان اطفال", city: "تهران", district: "منطقه ۳", schedule: "دوشنبه و چهارشنبه ۹ تا ۱۳", high_priority: 0 },
+      { name: "دکتر وحید قادری شرقی", medical_code: "55890", specialty: "داخلی و غدد", city: "تهران", district: "منطقه ۴", schedule: "چهارشنبه ۱۷ تا ۲۱", high_priority: 0 }
+    ];
+
+    let mockLogs = [
+      { username: "system", event_type: "INIT", entity_type: "local_test", details: "بارگذاری نسخه کامل با آپلود فایل و تولید اکشن‌پلن", ip_address: "127.0.0.1", created_at: "الان" }
+    ];
+
+    function getActiveConnection() {
+      return CONNECTION_ARRAY[currentProfileKey];
+    }
+
+    function updateBanner() {
+      const cfg = getActiveConnection();
+      const uname = currentUser ? `${currentUser.full_name || currentUser.username}` : "مهمان";
+      document.getElementById("activeUserBanner").textContent = `حالت فعلی: ${cfg.label} | کاربر: ${uname}`;
+    }
+
+    function switchConnectionProfile(key) {
+      currentProfileKey = CONNECTION_ARRAY[key] ? key : "local_mock";
+      const cfg = getActiveConnection();
+      document.getElementById("apiBaseUrlInput").value = cfg.baseUrl;
+      document.getElementById("activeProfileLabel").value = cfg.label;
+      document.getElementById("activeEndpointBadge").textContent = `${cfg.label} — ${cfg.baseUrl}`;
+      updateBanner();
+      refreshDoctorsList();
+      refreshAuditLogs();
+    }
+
+    function updateCustomEndpoint() {
+      const cfg = getActiveConnection();
+      cfg.baseUrl = document.getElementById("apiBaseUrlInput").value.trim() || cfg.baseUrl;
+      document.getElementById("activeEndpointBadge").textContent = `${cfg.label} — ${cfg.baseUrl}`;
+    }
+
+    async function testConnectionHealth() {
+      const cfg = getActiveConnection();
+      const statusEl = document.getElementById("healthStatusText");
+      if (cfg.id === "local_mock") {
+        statusEl.textContent = "✓ لوکال آماده است";
+        return;
+      }
+      try {
+        const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.health}`);
+        statusEl.textContent = res.ok ? "✓ سرور متصل است" : "⚠ خطای سرور";
+      } catch (_e) {
+        statusEl.textContent = "✕ بک‌اند در حال اجرا نیست";
+      }
+    }
+
+    function openAuthModal() {
+      if (currentUser) {
+        handleUserLogout();
+        return;
+      }
+      document.getElementById("authModal").classList.remove("hidden");
+      document.getElementById("authModal").classList.add("flex");
+    }
+
+    function closeAuthModal() {
+      document.getElementById("authModal").classList.add("hidden");
+      document.getElementById("authModal").classList.remove("flex");
+    }
+
+    async function handleUserLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const cfg = getActiveConnection();
+
+      if (cfg.id === "local_mock") {
+        if (username === "hossein" && password === "HOSSEIN1994@") {
+          currentUser = { username: "hossein", full_name: "حسین علی‌شیری" };
+          authToken = "local-demo-token";
+          mockLogs.unshift({ username, event_type: "LOGIN", entity_type: "session", details: "ورود موفق در حالت لوکال", ip_address: "127.0.0.1", created_at: "هم‌اکنون" });
+          updateAuthButton();
+          updateBanner();
+          closeAuthModal();
+          refreshAuditLogs();
+        } else {
+          alert("نام کاربری یا رمز اشتباه است.");
+        }
+        return;
+      }
+
+      const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.login}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      if (!res.ok) {
+        alert("ورود ناموفق بود.");
+        return;
+      }
+      const data = await res.json();
+      authToken = data.token;
+      currentUser = data.user;
+      updateAuthButton();
+      updateBanner();
+      closeAuthModal();
+      refreshDoctorsList();
+      refreshAuditLogs();
+    }
+
+    async function handleUserLogout() {
+      const cfg = getActiveConnection();
+      if (cfg.id !== "local_mock" && authToken) {
+        await fetch(`${cfg.baseUrl}${cfg.endpoints.logout}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+      } else if (currentUser) {
+        mockLogs.unshift({ username: currentUser.username, event_type: "LOGOUT", entity_type: "session", details: "خروج کاربر در حالت لوکال", ip_address: "127.0.0.1", created_at: "هم‌اکنون" });
+      }
+      authToken = null;
+      currentUser = null;
+      updateAuthButton();
+      updateBanner();
+      refreshAuditLogs();
+    }
+
+    function updateAuthButton() {
+      document.getElementById("authStatusBtn").textContent = currentUser ? `خروج (${currentUser.username})` : "ورود کاربر";
+    }
+
+    function openVaultModal() {
+      document.getElementById("vaultErr").classList.add("hidden");
+      document.getElementById("vaultModal").classList.remove("hidden");
+      document.getElementById("vaultModal").classList.add("flex");
+    }
+
+    function closeVaultModal() {
+      document.getElementById("vaultModal").classList.add("hidden");
+      document.getElementById("vaultModal").classList.remove("flex");
+    }
+
+    async function handleVaultUnlock(e) {
+      e.preventDefault();
+      const pass = document.getElementById("vaultPassInput").value;
+      const cfg = getActiveConnection();
+      if (pass !== "HOSSEIN1994@") {
+        document.getElementById("vaultErr").classList.remove("hidden");
+        return;
+      }
+      if (cfg.id !== "local_mock" && authToken) {
+        const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.unlockVault}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+          body: JSON.stringify({ password: pass })
+        });
+        if (!res.ok) {
+          document.getElementById("vaultErr").classList.remove("hidden");
+          return;
+        }
+      } else {
+        mockLogs.unshift({ username: currentUser?.username || "guest", event_type: "VAULT_UNLOCK", entity_type: "db_vault", details: "باز کردن دیتابیس با رمز HOSSEIN1994@", ip_address: "127.0.0.1", created_at: "هم‌اکنون" });
+      }
+      closeVaultModal();
+      refreshAuditLogs();
+      alert("دیتابیس با رمز HOSSEIN1994@ باز شد.");
+    }
+
+    function parseDoctorsText(rawText, fileName = "") {
+      const trimmed = rawText.trim();
+      if (!trimmed) return [];
+      if (fileName.toLowerCase().endsWith(".json") || trimmed.startsWith("[")) {
+        const parsed = JSON.parse(trimmed);
+        return (Array.isArray(parsed) ? parsed : []).map((item, idx) => ({
+          name: String(item.name || item.doctor_name || `پزشک ${idx + 1}`).trim(),
+          medical_code: String(item.medical_code || item.code || (90000 + idx)).trim(),
+          specialty: String(item.specialty || "عمومی").trim(),
+          city: String(item.city || "تهران").trim(),
+          district: String(item.district || "منطقه ۳").trim(),
+          schedule: String(item.schedule || "").trim(),
+          high_priority: Boolean(item.high_priority) ? 1 : 0
+        }));
+      }
+
+      const lines = trimmed.split(/?
+/).filter((l) => l.trim());
+      if (!lines.length) return [];
+      const delimiter = lines[0].includes("	") ? "	" : (lines[0].includes(";") ? ";" : ",");
+      const startIdx = (lines[0].includes("نام") || lines[0].toLowerCase().includes("name") || lines[0].includes("کد")) ? 1 : 0;
+
+      const results = [];
+      for (let i = startIdx; i < lines.length; i++) {
+        const cols = lines[i].split(delimiter).map((c) => c.replace(/^"|"$/g, "").trim());
+        if (!cols[0] && !cols[1]) continue;
+        results.push({
+          name: cols[0] || `پزشک ${i}`,
+          medical_code: cols[1] || String(70000 + i),
+          specialty: cols[2] || "فوق تخصص اطفال",
+          district: cols[3] || "منطقه ۳",
+          city: "تهران",
+          schedule: cols[4] || "شنبه تا چهارشنبه",
+          high_priority: ["1", "true", "بله", "بالا", "high"].includes((cols[5] || "").toLowerCase()) ? 1 : 0
+        });
+      }
+      return results;
+    }
+
+    async function handleDoctorFileUpload(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      try {
+        const imported = parseDoctorsText(text, file.name);
+        if (!imported.length) {
+          document.getElementById("uploadFeedback").textContent = "هیچ رکورد معتبری در فایل یافت نشد.";
+          return;
+        }
+        const cfg = getActiveConnection();
+        if (cfg.id === "local_mock") {
+          for (const doc of imported) {
+            const idx = mockDoctors.findIndex((d) => d.medical_code === doc.medical_code);
+            if (idx >= 0) mockDoctors[idx] = doc;
+            else mockDoctors.push(doc);
+          }
+          mockLogs.unshift({ username: currentUser?.username || "local_tester", event_type: "IMPORT", entity_type: "doctor_file", details: `آپلود ${imported.length} پزشک از فایل ${file.name}`, ip_address: "127.0.0.1", created_at: "هم‌اکنون" });
+          document.getElementById("uploadFeedback").textContent = `✓ ${imported.length} پزشک از فایل «${file.name}» بارگذاری شد.`;
+          refreshDoctorsList();
+          refreshAuditLogs();
+          return;
+        }
+
+        if (!authToken) {
+          alert("برای ذخیره روی سرور ابتدا وارد حساب کاربری شوید.");
+          return;
+        }
+        const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.bulkDoctors}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+          body: JSON.stringify({ doctors: imported })
+        });
+        if (res.ok) {
+          document.getElementById("uploadFeedback").textContent = `✓ ${imported.length} پزشک در دیتابیس سرور ذخیره شد.`;
+          refreshDoctorsList();
+          refreshAuditLogs();
+        }
+      } catch (err) {
+        document.getElementById("uploadFeedback").textContent = `خطا در خواندن فایل: ${err.message}`;
+      }
+    }
+
+    function downloadSampleCsv() {
+      const sample = [
+        "name,medical_code,specialty,district,schedule,high_priority",
+        "دکتر مریم کاظمی,41205,فوق تخصص اطفال,منطقه ۳,شنبه و دوشنبه ۱۷ تا ۲۰,1",
+        "دکتر سهراب مرادی,52981,متخصص مغز و اعصاب کودکان,منطقه ۴,یکشنبه و سه‌شنبه ۱۶ تا ۱۹,1",
+        "دکتر لیلا بهرامی,63409,فوق تخصص غدد اطفال,منطقه ۸,چهارشنبه ۹ تا ۱۳,0"
+      ].join("
+");
+      const blob = new Blob(["﻿" + sample], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "doctors_sample.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function handleAddDoctor(e) {
+      e.preventDefault();
+      const doc = {
+        name: document.getElementById("docNameInput").value.trim(),
+        medical_code: document.getElementById("docCodeInput").value.trim(),
+        specialty: document.getElementById("docSpecialtyInput").value.trim() || "عمومی",
+        city: "تهران",
+        district: document.getElementById("docDistrictInput").value.trim() || "منطقه ۳",
+        schedule: document.getElementById("docScheduleInput").value.trim() || "طبق برنامه مطب",
+        high_priority: document.getElementById("docPriorityInput").checked ? 1 : 0
+      };
+      const cfg = getActiveConnection();
+      if (cfg.id === "local_mock") {
+        const idx = mockDoctors.findIndex((d) => d.medical_code === doc.medical_code);
+        if (idx >= 0) mockDoctors[idx] = doc;
+        else mockDoctors.push(doc);
+        mockLogs.unshift({ username: currentUser?.username || "local_tester", event_type: "CREATE", entity_type: "doctor", details: `ثبت پزشک ${doc.name} (${doc.medical_code})`, ip_address: "127.0.0.1", created_at: "هم‌اکنون" });
+        e.target.reset();
+        refreshDoctorsList();
+        refreshAuditLogs();
+        return;
+      }
+      if (!authToken) {
+        alert("ابتدا وارد حساب کاربری شوید.");
+        return;
+      }
+      const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.doctors}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify(doc)
+      });
+      if (res.ok) {
+        e.target.reset();
+        refreshDoctorsList();
+        refreshAuditLogs();
+      }
+    }
+
+    async function deleteDoctorItem(code) {
+      const cfg = getActiveConnection();
+      if (cfg.id === "local_mock") {
+        mockDoctors = mockDoctors.filter((d) => d.medical_code !== code);
+        mockLogs.unshift({ username: currentUser?.username || "local_tester", event_type: "DELETE", entity_type: "doctor", details: `حذف پزشک کد ${code}`, ip_address: "127.0.0.1", created_at: "هم‌اکنون" });
+        refreshDoctorsList();
+        refreshAuditLogs();
+        return;
+      }
+      if (!authToken) return;
+      const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.doctors}/${encodeURIComponent(code)}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      if (res.ok) {
+        refreshDoctorsList();
+        refreshAuditLogs();
+      }
+    }
+
+    async function getCurrentDoctors() {
+      const cfg = getActiveConnection();
+      if (cfg.id !== "local_mock" && authToken) {
+        const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.doctors}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return data.doctors || [];
+        }
+      }
+      return mockDoctors;
+    }
+
+    async function refreshDoctorsList() {
+      const list = await getCurrentDoctors();
+      document.getElementById("doctorsCountBadge").textContent = `${list.length} پزشک`;
+      document.getElementById("doctorsBody").innerHTML = list.map((d) => `
+        <tr>
+          <td class="px-3 py-2 font-medium">${d.name}</td>
+          <td class="px-3 py-2 tabular-nums">${d.medical_code}</td>
+          <td class="px-3 py-2">${d.specialty || "-"} / ${d.district || "-"}</td>
+          <td class="px-3 py-2">${d.high_priority ? "★ بالا" : "عادی"}</td>
+          <td class="px-3 py-2">
+            <button type="button" onclick="deleteDoctorItem('${d.medical_code}')" class="text-rose-600 hover:underline">حذف</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function stepJalaliDate(jalaliStr, addDays) {
+      const parts = (jalaliStr || "1405/09/01").split("/").map((n) => parseInt(n, 10));
+      let y = parts[0] || 1405;
+      let m = parts[1] || 9;
+      let d = (parts[2] || 1) + addDays;
+      while (true) {
+        const daysInMonth = m <= 6 ? 31 : (m <= 11 ? 30 : 29);
+        if (d <= daysInMonth) break;
+        d -= daysInMonth;
+        m += 1;
+        if (m > 12) {
+          m = 1;
+          y += 1;
+        }
+      }
+      return `${String(y).padStart(4, "0")}/${String(m).padStart(2, "0")}/${String(d).padStart(2, "0")}`;
+    }
+
+    async function handleGenerateActionPlan(e) {
+      e.preventDefault();
+      const doctors = await getCurrentDoctors();
+      if (!doctors.length) {
+        alert("ابتدا حداقل یک پزشک اضافه یا آپلود کنید.");
+        return;
+      }
+
+      const title = document.getElementById("planTitleInput").value.trim() || "اکشن‌پلن ویزیت";
+      const startDate = document.getElementById("planStartDateInput").value.trim() || "1405/09/01";
+      const totalDays = Math.max(1, parseInt(document.getElementById("planDaysCountInput").value || "14", 10));
+      const dailyVisits = Math.max(1, parseInt(document.getElementById("planDailyVisitsInput").value || "3", 10));
+      const minGap = Math.max(0, parseInt(document.getElementById("planMinGapInput").value || "0", 10));
+      const skipFriday = document.getElementById("skipFridayInput").checked;
+
+      const sortedDocs = [...doctors].sort((a, b) => (b.high_priority ? 1 : 0) - (a.high_priority ? 1 : 0));
+      const lastVisitDayIdx = {};
+      const items = [];
+      let docCursor = 0;
+
+      for (let dayIdx = 0; dayIdx < totalDays; dayIdx++) {
+        const weekday = PERSIAN_WEEKDAYS[dayIdx % 7];
+        if (skipFriday && weekday === "جمعه") continue;
+        const jalaliDate = stepJalaliDate(startDate, dayIdx);
+
+        let placedToday = 0;
+        let attempts = 0;
+        while (placedToday < dailyVisits && attempts < sortedDocs.length * 4) {
+          const cand = sortedDocs[docCursor % sortedDocs.length];
+          docCursor += 1;
+          attempts += 1;
+
+          const prevDay = lastVisitDayIdx[cand.medical_code];
+          if (minGap > 0 && prevDay !== undefined && (dayIdx - prevDay) < minGap) {
+            continue;
+          }
+
+          lastVisitDayIdx[cand.medical_code] = dayIdx;
+          items.push({
+            visit_date_jalali: jalaliDate,
+            visit_weekday: weekday,
+            doctor_name: cand.name,
+            medical_code: cand.medical_code,
+            specialty: cand.specialty || "",
+            location: `${cand.city || "تهران"} - ${cand.district || ""}`,
+            schedule: cand.schedule || "",
+            priority_label: cand.high_priority ? "اولویت بالا" : "عادی",
+            is_high_priority: Boolean(cand.high_priority)
+          });
+          placedToday += 1;
+        }
+      }
+
+      generatedPlanItems = items;
+      document.getElementById("planSummaryBar").textContent = `✓ اکشن‌پلن «${title}» با ${items.length} نوبت ویزیت تولید شد.`;
+      document.getElementById("planItemsBody").innerHTML = items.map((it) => `
+        <tr>
+          <td class="px-3 py-2 tabular-nums">${it.visit_date_jalali}</td>
+          <td class="px-3 py-2">${it.visit_weekday}</td>
+          <td class="px-3 py-2 font-medium">${it.doctor_name}</td>
+          <td class="px-3 py-2 tabular-nums">${it.medical_code}</td>
+          <td class="px-3 py-2">${it.location}</td>
+        </tr>
+      `).join("");
+
+      const cfg = getActiveConnection();
+      if (cfg.id === "local_mock") {
+        mockLogs.unshift({ username: currentUser?.username || "local_tester", event_type: "PLAN_GENERATE", entity_type: "action_plan", details: `تولید «${title}» شامل ${items.length} ویزیت`, ip_address: "127.0.0.1", created_at: "هم‌اکنون" });
+        refreshAuditLogs();
+      } else if (authToken) {
+        await fetch(`${cfg.baseUrl}${cfg.endpoints.plans}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${authToken}` },
+          body: JSON.stringify({
+            title,
+            daily_visits: dailyVisits,
+            start_date_jalali: startDate,
+            end_date_jalali: stepJalaliDate(startDate, totalDays - 1),
+            excluded_rules: skipFriday ? "جمعه" : "هیچ‌کدام",
+            min_gap_enabled: minGap > 0,
+            min_gap_days: minGap,
+            items
+          })
+        });
+        refreshAuditLogs();
+      }
+    }
+
+    function exportPlanCsv() {
+      if (!generatedPlanItems.length) {
+        alert("ابتدا یک اکشن‌پلن تولید کنید.");
+        return;
+      }
+      const header = ["تاریخ", "روز هفته", "نام پزشک", "کد نظام پزشکی", "تخصص", "محدوده", "اولویت"];
+      const rows = generatedPlanItems.map((i) => [
+        i.visit_date_jalali, i.visit_weekday, i.doctor_name, i.medical_code, i.specialty, i.location, i.priority_label
+      ].map((v) => `"${String(v || "").replace(/"/g, '""')}"`).join(","));
+      const csvContent = "﻿" + [header.join(","), ...rows].join("
+");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "action_plan.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function refreshAuditLogs() {
+      const cfg = getActiveConnection();
+      let logs = mockLogs;
+      if (cfg.id !== "local_mock" && authToken) {
+        const res = await fetch(`${cfg.baseUrl}${cfg.endpoints.auditLogs}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          logs = data.logs || [];
+        }
+      }
+      document.getElementById("auditLogsBody").innerHTML = logs.map((l) => `
+        <tr>
+          <td class="px-3 py-2 font-medium">${l.username}</td>
+          <td class="px-3 py-2 font-mono text-teal-800">${l.event_type}</td>
+          <td class="px-3 py-2">${l.entity_type}</td>
+          <td class="px-3 py-2">${l.details || "-"}</td>
+          <td class="px-3 py-2 tabular-nums">${l.ip_address || "-"}</td>
+          <td class="px-3 py-2 tabular-nums">${l.created_at}</td>
+        </tr>
+      `).join("");
+    }
+
+    switchConnectionProfile("local_mock");
+  </script>
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>گیک‌وب | طراحی UI/UX، وردپرس و وب اپلیکیشن</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fdf8f5;
+      --surface: #ffffff;
+      --surface-2: #f6efe9;
+      --text: #1e2430;
+      --muted: #5c6578;
+      --border: #e7ddd4;
+      --p-mint: #bce7d6;
+      --p-peach: #ffd6c2;
+      --p-lavender: #dcd2ff;
+      --p-sky: #cce7ff;
+      --accent: #3d5afe;
+      --accent-ink: #ffffff;
+      --shadow: 0 12px 32px rgba(30, 36, 48, 0.06);
+    }
+
+    body.dark {
+      --bg: #11151f;
+      --surface: #181e2c;
+      --surface-2: #20283a;
+      --text: #f1f5f9;
+      --muted: #9aa6bd;
+      --border: #2a3449;
+      --p-mint: #1d463c;
+      --p-peach: #4a2d24;
+      --p-lavender: #342954;
+      --p-sky: #1e3a52;
+      --accent: #7c93ff;
+      --accent-ink: #0e1320;
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      transition: background 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 18px; }
+
+    header {
+      position: sticky; top: 0; z-index: 40;
+      backdrop-filter: blur(12px);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; min-height: 68px; flex-wrap: wrap;
+    }
+
+    .brand-title {
+      font-family: 'Lalezar', cursive;
+      font-size: 1.65rem;
+      letter-spacing: 0.3px;
+    }
+
+    .header-actions {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+
+    .btn-order-top {
+      display: inline-flex; align-items: center; justify-content: center;
+      text-align: center;
+      font-family: 'Lalezar', cursive;
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: var(--accent-ink);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      max-width: 100%;
+      white-space: nowrap;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+    .btn-order-top:hover { transform: translateY(-1px); opacity: 0.95; }
+
+    .btn-ghost {
+      padding: 8px 14px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: inherit; font-size: 0.85rem; cursor: pointer;
+    }
+
+    .hero { padding: 40px 0 28px; }
+    .hero-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 26px; padding: 28px 22px; box-shadow: var(--shadow);
+    }
+    .hero h1 { font-size: clamp(1.45rem, 3.5vw, 2.25rem); margin-bottom: 10px; font-weight: 800; }
+    .hero p { color: var(--muted); max-width: 72ch; margin-bottom: 20px; }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .service-pill {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 18px; padding: 16px;
+    }
+    .service-pill.mint { background: var(--p-mint); }
+    .service-pill.peach { background: var(--p-peach); }
+    .service-pill.lavender { background: var(--p-lavender); }
+    .service-pill.sky { background: var(--p-sky); }
+    .service-pill h3 { font-size: 1rem; margin-bottom: 6px; }
+    .service-pill p { font-size: 0.86rem; color: var(--text); opacity: 0.9; margin: 0; }
+
+    section { padding: 34px 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+    .section-head h2 { font-size: 1.35rem; }
+
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      padding: 6px 13px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); font-size: 0.84rem; cursor: pointer;
+    }
+    .chip.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+    .portfolio-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 18px; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+    }
+    .tag { display: inline-block; font-size: 0.76rem; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); }
+    .sub-url { direction: ltr; text-align: left; font-size: 0.78rem; color: var(--muted); word-break: break-all; }
+
+    .panel-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; padding: 24px; box-shadow: var(--shadow);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+    label { display: block; font-size: 0.85rem; margin-bottom: 6px; color: var(--muted); }
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+      font-family: inherit;
+    }
+    .btn-primary {
+      margin-top: 14px; padding: 10px 20px; border-radius: 12px; border: none;
+      background: var(--accent); color: var(--accent-ink); font-family: inherit; font-weight: 700; cursor: pointer;
+    }
+    .notice { margin-top: 12px; padding: 10px 14px; border-radius: 12px; background: var(--surface-2); font-size: 0.88rem; }
+    .order-item {
+      border: 1px solid var(--border); background: var(--surface-2);
+      border-radius: 14px; padding: 12px 14px; margin-top: 10px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    footer { border-top: 1px solid var(--border); padding: 22px 0; text-align: center; color: var(--muted); font-size: 0.86rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav-wrap">
+      <div class="brand-title">گیک‌وب</div>
+      <div class="header-actions">
+        <button type="button" class="btn-order-top" onclick="scrollToOrder()">همین حالا سفارش بده</button>
+        <button type="button" class="btn-ghost" id="themeToggle" onclick="toggleTheme()">تم تیره</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-card">
+        <h1>طراحی و اجرای محصولات دیجیتال سریع، سئو محور و موبایل‌فرست</h1>
+        <p>تمرکز گیک‌وب بر خلق تجربه کاربری روان، کدنویسی تمیز و پنل مشتری یکپارچه برای سفارش و پیگیری پروژه است.</p>
+        <div class="services-grid">
+          <div class="service-pill mint">
+            <h3>طراحی UI/UX</h3>
+            <p>طراحی رابط کاربری مدرن، سیستم طراحی و جریان کاربر بهینه برای وب و موبایل.</p>
+          </div>
+          <div class="service-pill peach">
+            <h3>طراحی سایت وردپرسی</h3>
+            <p>طراحی اختصاصی و چشم‌نواز متناسب با هویت برند و نمایش حرفه‌ای خدمات یا فروشگاه.</p>
+          </div>
+          <div class="service-pill lavender">
+            <h3>اجرای سایت وردپرسی</h3>
+            <p>پیاده‌سازی سریع، سبک، امن و بهینه برای سئو با کمترین بار اضافی.</p>
+          </div>
+          <div class="service-pill sky">
+            <h3>وب اپلیکیشن</h3>
+            <p>توسعه سامانه‌های تحت وب داینامیک، داشبورد اختصاصی و بکند مقیاس‌پذیر.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="portfolio">
+      <div class="section-head">
+        <h2>نمونه‌کارهای منتخب</h2>
+        <div class="filters" id="filterBar">
+          <button type="button" class="chip active" data-cat="all" onclick="filterPortfolio('all', this)">همه (۸)</button>
+          <button type="button" class="chip" data-cat="uiux" onclick="filterPortfolio('uiux', this)">UI/UX</button>
+          <button type="button" class="chip" data-cat="wp-design" onclick="filterPortfolio('wp-design', this)">طراحی وردپرس</button>
+          <button type="button" class="chip" data-cat="wp-exec" onclick="filterPortfolio('wp-exec', this)">اجرای وردپرس</button>
+          <button type="button" class="chip" data-cat="webapp" onclick="filterPortfolio('webapp', this)">وب اپلیکیشن</button>
+        </div>
+      </div>
+      <div class="portfolio-grid" id="portfolioGrid"></div>
+    </section>
+
+    <section id="order-panel">
+      <div class="panel-box">
+        <h2>پنل مشتری و ثبت سفارش</h2>
+        <p style="color: var(--muted); font-size: 0.9rem;">ورود امن بدون رمز عبور با شماره موبایل، کپچای ضدربات و کد یک‌بار مصرف (OTP).</p>
+
+        <div id="authStep">
+          <div class="form-grid">
+            <div>
+              <label for="phoneInput">شماره موبایل</label>
+              <input id="phoneInput" type="tel" placeholder="09123456789" maxlength="11" />
+            </div>
+            <div>
+              <label id="captchaLabel" for="captchaInput">کد امنیتی (در حال بارگذاری...)</label>
+              <input id="captchaInput" type="text" placeholder="پاسخ را وارد کنید" />
+            </div>
+            <div>
+              <label for="otpInput">کد یک‌بار مصرف ۶ رقمی</label>
+              <input id="otpInput" type="text" placeholder="مثلاً 482910" maxlength="6" />
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn-primary" onclick="sendOtp()">دریافت کد یک‌بار مصرف</button>
+            <button type="button" class="btn-ghost" style="margin-top:14px;" onclick="verifyOtp()">ورود به پنل مشتری</button>
+            <button type="button" class="btn-ghost" style="margin-top:14px;" onclick="refreshCaptcha()">تازه‌سازی کپچا</button>
+          </div>
+        </div>
+
+        <div id="dashboardStep" style="display:none; margin-top: 18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div><strong>کاربر واردشده:</strong> <span id="activePhone"></span></div>
+            <button type="button" class="btn-ghost" onclick="logout()">خروج</button>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label for="serviceSelect">انتخاب خدمت</label>
+              <select id="serviceSelect" onchange="updatePricePreview()">
+                <option value="طراحی UI/UX" data-price="18000000">طراحی UI/UX (۱۸,۰۰۰,۰۰۰ تومان)</option>
+                <option value="طراحی سایت وردپرسی" data-price="22000000">طراحی سایت وردپرسی (۲۲,۰۰۰,۰۰۰ تومان)</option>
+                <option value="اجرای سایت وردپرسی" data-price="15000000">اجرای سایت وردپرسی (۱۵,۰۰۰,۰۰۰ تومان)</option>
+                <option value="وب اپلیکیشن" data-price="45000000">وب اپلیکیشن (۴۵,۰۰۰,۰۰۰ تومان)</option>
+              </select>
+            </div>
+            <div>
+              <label for="gatewaySelect">انتخاب شبکه / درگاه بانکی</label>
+              <select id="gatewaySelect">
+                <option value="GATEWAY_A">درگاه بانکی اول (شتاب / پرداخت آنلاین)</option>
+                <option value="GATEWAY_B">درگاه بانکی دوم (پشتیبانی اضطراری و سریع)</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" onclick="createOrder()">ثبت سفارش و ایجاد پرداخت</button>
+          <div id="ordersList"></div>
+        </div>
+
+        <div id="statusNotice" class="notice" style="display:none;"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">گیک‌وب — طراحی و توسعه محصولات وب مدرن</div>
+  </footer>
+
+  <script>
+    const items = [
+      { cat: 'uiux', catLabel: 'UI/UX', title: 'اپلیکیشن مدیریت مالی و بودجه', sub: 'ui-fintech.gikweb.com', desc: 'طراحی کارت‌های مالی، نمودارهای واضح و سفر کاربری سریع در موبایل.' },
+      { cat: 'uiux', catLabel: 'UI/UX', title: 'پلتفرم نوبت‌دهی و پرونده سلامت', sub: 'ui-health.gikweb.com', desc: 'تمرکز بر خوانایی، دسترسی‌پذیری و رزرو کم‌اصطکاک در گوشی.' },
+      { cat: 'wp-design', catLabel: 'طراحی وردپرس', title: 'سایت برند خلاق و آژانس دیجیتال', sub: 'wp-design-studio.gikweb.com', desc: 'هویت بصری متمایز، انیمیشن‌های نرم و معرفی تعاملی پروژه‌ها.' },
+      { cat: 'wp-design', catLabel: 'طراحی وردپرس', title: 'فروشگاه تخصصی سبک زندگی', sub: 'wp-design-store.gikweb.com', desc: 'چیدمان محصول‌محور، فیلتر سریع و تجربه خرید روان در موبایل.' },
+      { cat: 'wp-exec', catLabel: 'اجرای وردپرس', title: 'پورتال سازمانی و B2B', sub: 'wp-exec-corp.gikweb.com', desc: 'پیاده‌سازی سبک، ساختار سئوی دقیق و زمان بارگذاری پایین.' },
+      { cat: 'wp-exec', catLabel: 'اجرای وردپرس', title: 'سامانه آموزشی و دوره‌های آنلاین', sub: 'wp-exec-edu.gikweb.com', desc: 'ساختار منظم سرفصل‌ها، صفحه فرود بهینه و کاربری ساده.' },
+      { cat: 'webapp', catLabel: 'وب اپلیکیشن', title: 'داشبورد مدیریت مشتریان و فروش', sub: 'webapp-crm.gikweb.com', desc: 'فیلتر لحظه‌ای، وضعیت سفارش‌ها و گزارش‌گیری واکنش‌گرا.' },
+      { cat: 'webapp', catLabel: 'وب اپلیکیشن', title: 'سامانه رزرو و زمان‌بندی هوشمند', sub: 'webapp-booking.gikweb.com', desc: 'تقویم تعاملی، انتخاب بازه زمانی و تایید آنی سفارش.' }
+    ];
+
+    let captchaExpected = 0;
+    let pendingOtp = '';
+    let activeSessionPhone = '';
+    const orders = [];
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      document.getElementById('themeToggle').textContent = isDark ? 'تم روشن' : 'تم تیره';
+    }
+
+    function scrollToOrder() {
+      document.getElementById('order-panel').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderPortfolio(cat = 'all') {
+      const grid = document.getElementById('portfolioGrid');
+      const filtered = cat === 'all' ? items : items.filter(i => i.cat === cat);
+      grid.innerHTML = filtered.map(item => `
+        <article class="card">
+          <div>
+            <span class="tag">${item.catLabel}</span>
+            <h3 style="margin-top:10px; font-size:1.05rem;">${item.title}</h3>
+            <p style="color:var(--muted); font-size:0.86rem; margin-top:6px;">${item.desc}</p>
+          </div>
+          <div class="sub-url">${item.sub}</div>
+        </article>
+      `).join('');
+    }
+
+    function filterPortfolio(cat, btn) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderPortfolio(cat);
+    }
+
+    function refreshCaptcha() {
+      const a = Math.floor(Math.random() * 8) + 2;
+      const b = Math.floor(Math.random() * 8) + 1;
+      captchaExpected = a + b;
+      document.getElementById('captchaLabel').textContent = `کد امنیتی: حاصل ${a} + ${b} چند است؟`;
+      document.getElementById('captchaInput').value = '';
+    }
+
+    function showNotice(msg) {
+      const el = document.getElementById('statusNotice');
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+
+    function sendOtp() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      const cap = Number(document.getElementById('captchaInput').value.trim());
+      if (!/^09\d{9}$/.test(phone)) {
+        return showNotice('لطفاً شماره موبایل معتبر ۱۱ رقمی (مانند 09123456789) وارد کنید.');
+      }
+      if (cap !== captchaExpected) {
+        refreshCaptcha();
+        return showNotice('پاسخ کپچا اشتباه است. کد امنیتی جدید ایجاد شد.');
+      }
+      pendingOtp = String(Math.floor(100000 + Math.random() * 900000));
+      document.getElementById('otpInput').value = pendingOtp;
+      refreshCaptcha();
+      showNotice(`کد یک‌بار مصرف آزمایشی ارسال شد: ${pendingOtp}`);
+    }
+
+    function verifyOtp() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      const otp = document.getElementById('otpInput').value.trim();
+      if (!pendingOtp || otp !== pendingOtp) {
+        return showNotice('کد یک‌بار مصرف نامعتبر است.');
+      }
+      activeSessionPhone = phone;
+      pendingOtp = '';
+      document.getElementById('authStep').style.display = 'none';
+      document.getElementById('dashboardStep').style.display = 'block';
+      document.getElementById('activePhone').textContent = activeSessionPhone;
+      showNotice('ورود با موفقیت انجام شد.');
+      renderOrders();
+    }
+
+    function logout() {
+      activeSessionPhone = '';
+      document.getElementById('dashboardStep').style.display = 'none';
+      document.getElementById('authStep').style.display = 'block';
+      showNotice('از پنل مشتری خارج شدید.');
+    }
+
+    function updatePricePreview() {}
+
+    function createOrder() {
+      const select = document.getElementById('serviceSelect');
+      const service = select.value;
+      const price = Number(select.options[select.selectedIndex].dataset.price);
+      const gateway = document.getElementById('gatewaySelect').value;
+      const id = 'GW-' + Math.floor(100000 + Math.random() * 900000);
+      orders.unshift({ id, service, price, gateway, status: 'آماده پرداخت (در انتظار تایید درگاه)' });
+      renderOrders();
+      showNotice(`سفارش ${id} با درگاه ${gateway} ثبت شد.`);
+    }
+
+    function renderOrders() {
+      const list = document.getElementById('ordersList');
+      if (!orders.length) {
+        list.innerHTML = '<p style="color:var(--muted); margin-top:12px; font-size:0.88rem;">هنوز سفارشی ثبت نشده است.</p>';
+        return;
+      }
+      list.innerHTML = orders.map(o => `
+        <div class="order-item">
+          <div>
+            <strong>${o.id}</strong> — ${o.service}
+            <div style="font-size:0.8rem; color:var(--muted);">درگاه: ${o.gateway} | وضعیت: ${o.status}</div>
+          </div>
+          <strong>${o.price.toLocaleString('fa-IR')} تومان</strong>
+        </div>
+      `).join('');
+    }
+
+    renderPortfolio();
+    refreshCaptcha();
+  </script>
+</body>
+</html>

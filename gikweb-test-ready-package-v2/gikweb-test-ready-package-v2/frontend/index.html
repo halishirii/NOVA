@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>گیک‌وب | طراحی UI/UX، وردپرس و وب اپلیکیشن</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --p-bg: #fdf8f5;
+      --p-surface: #ffffff;
+      --p-surface-2: #f6efe9;
+      --p-text: #1e2430;
+      --p-muted: #5c6578;
+      --p-border: #e7ddd4;
+      --p-mint: #bce7d6;
+      --p-peach: #ffd6c2;
+      --p-lavender: #dcd2ff;
+      --p-sky: #cce7ff;
+      --p-accent: #3d5afe;
+      --p-accent-ink: #ffffff;
+      --p-shadow: 0 12px 32px rgba(30, 36, 48, 0.06);
+    }
+    body.dark {
+      --p-bg: #11151f;
+      --p-surface: #181e2c;
+      --p-surface-2: #20283a;
+      --p-text: #f1f5f9;
+      --p-muted: #9aa6bd;
+      --p-border: #2a3449;
+      --p-mint: #1d463c;
+      --p-peach: #4a2d24;
+      --p-lavender: #342954;
+      --p-sky: #1e3a52;
+      --p-accent: #7c93ff;
+      --p-accent-ink: #0e1320;
+      --p-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: var(--p-bg);
+      color: var(--p-text);
+      line-height: 1.75;
+      transition: background 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 18px; }
+    header {
+      position: sticky; top: 0; z-index: 40;
+      backdrop-filter: blur(12px);
+      background: color-mix(in srgb, var(--p-bg) 84%, transparent);
+      border-bottom: 1px solid var(--p-border);
+    }
+    .nav-wrap { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 68px; flex-wrap: wrap; }
+    .brand-title { font-family: 'Lalezar', cursive; font-size: 1.65rem; }
+    .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .btn-order-top {
+      display: inline-flex; align-items: center; justify-content: center; text-align: center;
+      font-family: 'Lalezar', cursive; font-size: clamp(0.95rem, 2vw, 1.12rem);
+      padding: 8px 18px; border-radius: 999px; border: none;
+      background: var(--p-accent); color: var(--p-accent-ink); cursor: pointer;
+    }
+    .btn-ghost {
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--p-border);
+      background: var(--p-surface); color: var(--p-text); font-family: inherit; font-size: 0.85rem; cursor: pointer;
+    }
+    .hero { padding: 34px 0 22px; }
+    .hero-card { background: var(--p-surface); border: 1px solid var(--p-border); border-radius: 26px; padding: 26px 22px; box-shadow: var(--p-shadow); }
+    .hero h1 { font-size: clamp(1.4rem, 3.4vw, 2.2rem); margin-bottom: 10px; font-weight: 800; }
+    .hero p { color: var(--p-muted); max-width: 76ch; margin-bottom: 18px; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .service-pill { background: var(--p-surface-2); border: 1px solid var(--p-border); border-radius: 18px; padding: 16px; }
+    .service-pill.mint { background: var(--p-mint); }
+    .service-pill.peach { background: var(--p-peach); }
+    .service-pill.lavender { background: var(--p-lavender); }
+    .service-pill.sky { background: var(--p-sky); }
+    .service-pill h3 { font-size: 1rem; margin-bottom: 6px; }
+    .service-pill p { font-size: 0.86rem; margin: 0; }
+    section { padding: 30px 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { padding: 6px 13px; border-radius: 999px; border: 1px solid var(--p-border); background: var(--p-surface); color: var(--p-text); font-size: 0.84rem; cursor: pointer; font-family: inherit; }
+    .chip.active { background: var(--p-accent); color: var(--p-accent-ink); border-color: var(--p-accent); }
+    .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: var(--p-surface); border: 1px solid var(--p-border); border-radius: 20px; padding: 18px; box-shadow: var(--p-shadow); display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
+    .tag { display: inline-block; font-size: 0.76rem; padding: 3px 10px; border-radius: 999px; background: var(--p-surface-2); border: 1px solid var(--p-border); }
+    .sub-url { direction: ltr; text-align: left; font-size: 0.78rem; color: var(--p-muted); word-break: break-all; }
+    .price-line { font-weight: 800; color: var(--p-accent); font-size: 0.92rem; margin-top: 8px; }
+    .btn-enter { width: 100%; padding: 9px 14px; border-radius: 12px; border: none; background: var(--p-accent); color: var(--p-accent-ink); font-family: inherit; font-weight: 700; cursor: pointer; }
+    .panel-box { background: var(--p-surface); border: 1px solid var(--p-border); border-radius: 24px; padding: 24px; box-shadow: var(--p-shadow); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+    label { display: block; font-size: 0.85rem; margin-bottom: 6px; color: var(--p-muted); }
+    input, select, textarea { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--p-border); background: var(--p-surface-2); color: var(--p-text); font-family: inherit; }
+    textarea { min-height: 82px; resize: vertical; }
+    .btn-primary { margin-top: 14px; padding: 10px 20px; border-radius: 12px; border: none; background: var(--p-accent); color: var(--p-accent-ink); font-family: inherit; font-weight: 700; cursor: pointer; }
+    .notice { margin-top: 12px; padding: 10px 14px; border-radius: 12px; background: var(--p-surface-2); font-size: 0.88rem; }
+    .cart-card { border: 1px solid var(--p-border); background: var(--p-surface-2); border-radius: 16px; padding: 14px 16px; margin-top: 12px; }
+    .cart-total-bar { margin-top: 16px; padding: 14px 18px; border-radius: 16px; background: var(--p-mint); color: var(--p-text); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-weight: 800; }
+
+    #isolatedProjectView { display: none; min-height: 100vh; background: var(--proj-bg, #f4faf7); color: var(--proj-text, #14222b); padding: 20px 16px 48px; }
+    .proj-shell { max-width: 1020px; margin: 0 auto; }
+    .proj-topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .btn-back-gikweb { padding: 9px 16px; border-radius: 12px; border: 1px solid var(--proj-accent, #136f53); background: var(--proj-card, #fff); color: var(--proj-accent, #136f53); font-family: inherit; font-weight: 700; cursor: pointer; }
+    .palette-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .palette-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.14); background: var(--proj-card, #fff); color: var(--proj-text, #14222b); font-family: inherit; font-size: 0.8rem; cursor: pointer; }
+    .palette-btn.active { outline: 2px solid var(--proj-accent, #136f53); font-weight: 700; }
+    .swatch { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .proj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+    .proj-card { background: var(--proj-card, #fff); border-radius: 20px; padding: 20px; border: 1px solid rgba(0,0,0,0.07); }
+    .addon-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--proj-soft, #e5f5ee); margin-top: 8px; font-size: 0.88rem; }
+    .addon-row label { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: inherit; cursor: pointer; }
+    .addon-row input[type="checkbox"] { width: auto; margin-top: 4px; }
+    .proj-cta { width: 100%; margin-top: 14px; padding: 11px 18px; border-radius: 12px; border: none; background: var(--proj-accent, #136f53); color: #ffffff; font-family: inherit; font-weight: 800; cursor: pointer; }
+    footer { border-top: 1px solid var(--p-border); padding: 22px 0; text-align: center; color: var(--p-muted); font-size: 0.86rem; }
+  </style>
+</head>
+<body>
+  <div id="mainSiteWrapper">
+    <header>
+      <div class="container nav-wrap">
+        <div class="brand-title">گیک‌وب</div>
+        <div class="header-actions">
+          <button type="button" class="btn-order-top" onclick="scrollToSection('cart-panel')">همین حالا سفارش بده</button>
+          <button type="button" class="btn-ghost" onclick="scrollToSection('cart-panel')">سبد خرید (<span id="headerCartCount">۰</span>)</button>
+          <button type="button" class="btn-ghost" id="themeToggle" onclick="toggleTheme()">تم تیره</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <h1>طراحی و اجرای محصولات دیجیتال سریع، سئو محور و موبایل‌فرست</h1>
+          <p>پکیج تست کامل گیک‌وب: ورود به هر یک از ۸ نمونه‌کار، تغییر پالت رنگی، انتخاب قابلیت‌های قیمت‌دار، ثبت توضیحات و تکمیل سفارش از طریق سبد خرید.</p>
+          <div class="services-grid">
+            <div class="service-pill mint"><h3>طراحی UI/UX</h3><p>طراحی رابط کاربری مدرن، سیستم طراحی و جریان کاربر بهینه برای وب و موبایل.</p></div>
+            <div class="service-pill peach"><h3>طراحی سایت وردپرسی</h3><p>طراحی اختصاصی و چشم‌نواز متناسب با هویت برند و نمایش حرفه‌ای خدمات یا فروشگاه.</p></div>
+            <div class="service-pill lavender"><h3>اجرای سایت وردپرسی</h3><p>پیاده‌سازی سریع، سبک، امن و بهینه برای سئو با کمترین بار اضافی.</p></div>
+            <div class="service-pill sky"><h3>وب اپلیکیشن</h3><p>توسعه سامانه‌های تحت وب داینامیک، داشبورد اختصاصی و بکند مقیاس‌پذیر.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="portfolio">
+        <div class="section-head">
+          <h2>نمونه‌کارهای اجرایی و قابل سفارش</h2>
+          <div class="filters" id="filterBar">
+            <button type="button" class="chip active" onclick="filterPortfolio('all', this)">همه (۸)</button>
+            <button type="button" class="chip" onclick="filterPortfolio('uiux', this)">UI/UX</button>
+            <button type="button" class="chip" onclick="filterPortfolio('wp-design', this)">طراحی وردپرس</button>
+            <button type="button" class="chip" onclick="filterPortfolio('wp-exec', this)">اجرای وردپرس</button>
+            <button type="button" class="chip" onclick="filterPortfolio('webapp', this)">وب اپلیکیشن</button>
+          </div>
+        </div>
+        <div class="portfolio-grid" id="portfolioGrid"></div>
+      </section>
+
+      <section id="cart-panel">
+        <div class="panel-box">
+          <h2>سبد خرید، توضیحات سفارشی و پنل مشتری</h2>
+          <div style="margin-top:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <label for="apiBaseInput" style="margin:0;">آدرس بک‌اند برای تست API:</label>
+            <input id="apiBaseInput" type="text" value="http://localhost:4000" style="max-width:260px;" />
+          </div>
+
+          <div id="cartItemsContainer"></div>
+          <div class="cart-total-bar">
+            <span>جمع کل سبد خرید:</span>
+            <span id="cartGrandTotal">۰ تومان</span>
+          </div>
+
+          <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--p-border);">
+            <h3 style="font-size: 1.08rem;">ورود به پنل مشتری (شماره موبایل + کپچا + کد یک‌بار مصرف)</h3>
+            <div class="form-grid">
+              <div><label for="phoneInput">شماره موبایل</label><input id="phoneInput" type="tel" placeholder="09123456789" maxlength="11" /></div>
+              <div><label id="captchaLabel" for="captchaInput">کد امنیتی</label><input id="captchaInput" type="text" placeholder="پاسخ را وارد کنید" /></div>
+              <div><label for="otpInput">کد یک‌بار مصرف ۶ رقمی</label><input id="otpInput" type="text" placeholder="کد ۶ رقمی" maxlength="6" /></div>
+              <div>
+                <label for="gatewaySelect">شبکه / درگاه بانکی</label>
+                <select id="gatewaySelect">
+                  <option value="GATEWAY_A">درگاه بانکی اول</option>
+                  <option value="GATEWAY_B">درگاه بانکی دوم</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="btn-primary" onclick="sendOtp()">دریافت کد یک‌بار مصرف</button>
+              <button type="button" class="btn-primary" onclick="submitCartOrder()">تایید ورود و ثبت سفارش سبد</button>
+              <button type="button" class="btn-ghost" style="margin-top:14px;" onclick="refreshCaptcha()">تازه‌سازی کپچا</button>
+            </div>
+          </div>
+          <div id="statusNotice" class="notice" style="display:none;"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer><div class="container">گیک‌وب — بسته تست و پیاده‌سازی</div></footer>
+  </div>
+
+  <div id="isolatedProjectView">
+    <div class="proj-shell">
+      <div class="proj-topbar">
+        <button type="button" class="btn-back-gikweb" onclick="exitProjectWorkspace()">← بازگشت به گیک‌وب</button>
+        <div class="palette-bar" id="paletteSwitcher"></div>
+      </div>
+      <div id="projectDynamicContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const PROJECTS = [{"id": "ui-fintech", "cat": "uiux", "catLabel": "طراحی UI/UX", "subdomain": "ui-fintech.gikweb.com", "title": "اپلیکیشن مدیریت مالی و بودجه شخصی", "summary": "طراحی رابط و تجربه کاربری داشبورد نقدینگی، کارت‌های مالی و بودجه‌بندی هوشمند با تمرکز بر سرعت عمل در موبایل.", "basePrice": 18000000, "palettes": [{"name": "نعنایی و سرمه‌ای", "bg": "#f4faf7", "card": "#ffffff", "accent": "#136f53", "soft": "#c8f1e2", "text": "#14222b"}, {"name": "هلویی و زغالی", "bg": "#fff8f4", "card": "#ffffff", "accent": "#c2410c", "soft": "#fed7aa", "text": "#261b16"}, {"name": "آبی آسمانی و نیلی", "bg": "#f3f8ff", "card": "#ffffff", "accent": "#1d4ed8", "soft": "#dbeafe", "text": "#141f38"}], "addons": [{"id": "fin-charts", "title": "طراحی ویجت نمودار مقایسه ماهانه درآمد و هزینه", "price": 3500000}, {"id": "fin-rules", "title": "طراحی جریان هشدار هوشمند سقف بودجه دسته‌ها", "price": 2800000}, {"id": "fin-export", "title": "طراحی صفحه گزارش‌گیری و خروجی صورتحساب", "price": 2200000}], "sampleRole": "داشبورد نقدینگی ماهانه", "sampleHighlight": "امکان ثبت سریع تراکنش و پایش بودجه باقی‌مانده در نمای موبایل"}, {"id": "ui-health", "cat": "uiux", "catLabel": "طراحی UI/UX", "subdomain": "ui-health.gikweb.com", "title": "پلتفرم نوبت‌دهی و پرونده سلامت", "summary": "طراحی تجربه کاربری شفاف و کم‌اصطکاک برای رزرو نوبت، مرور سوابق درمانی و یادآوری ویزیت در گوشی.", "basePrice": 19500000, "palettes": [{"name": "یاسی و بنفش ملایم", "bg": "#f8f6ff", "card": "#ffffff", "accent": "#5b21b6", "soft": "#e9d5ff", "text": "#1c1829"}, {"name": "فیروزه‌ای و یشمی", "bg": "#f2fbf9", "card": "#ffffff", "accent": "#0f766e", "soft": "#ccfbf1", "text": "#122624"}, {"name": "رز پاستلی و سرمه‌ای", "bg": "#fff6f8", "card": "#ffffff", "accent": "#be185d", "soft": "#fce7f3", "text": "#271720"}], "addons": [{"id": "hl-triage", "title": "طراحی فرم غربالگری و شرح حال پیش از ویزیت", "price": 3200000}, {"id": "hl-timeline", "title": "طراحی خط زمانی نسخه، آزمایش و یادآور دارو", "price": 3800000}, {"id": "hl-a11y", "title": "بسته‌بندی دسترسی‌پذیری و فونت بزرگ سالمندان", "price": 2400000}], "sampleRole": "رزرو نوبت سریع", "sampleHighlight": "انتخاب بازه زمانی ویزیت و ثبت نام مراجعه‌کننده بدون پیچیدگی"}, {"id": "wp-design-studio", "cat": "wp-design", "catLabel": "طراحی سایت وردپرسی", "subdomain": "wp-design-studio.gikweb.com", "title": "سایت برند خلاق و آژانس دیجیتال", "summary": "طراحی بصری اختصاصی با هویت گرافیکی متمایز، معرفی پروژه‌ها و چیدمان ماژولار قابل ویرایش در وردپرس.", "basePrice": 22000000, "palettes": [{"name": "مرجانی و کرم گرم", "bg": "#fff8f3", "card": "#ffffff", "accent": "#ea580c", "soft": "#ffedd5", "text": "#261a14"}, {"name": "لیمویی پاستلی و زیتونی", "bg": "#f9fbf2", "card": "#ffffff", "accent": "#4d7c0f", "soft": "#ecfccb", "text": "#1c2411"}, {"name": "ارغوانی و صدفی", "bg": "#fcf6ff", "card": "#ffffff", "accent": "#7e22ce", "soft": "#f3e8ff", "text": "#241630"}], "addons": [{"id": "wpd-case", "title": "قالب اختصاصی صفحه مطالعه موردی و گالری پروژه", "price": 4200000}, {"id": "wpd-motion", "title": "انیمیشن‌های ظریف اسکرول و انتقال بخش‌ها", "price": 3000000}, {"id": "wpd-brief", "title": "فرم دریافت استعلام پروژه و برآورد اولیه", "price": 2500000}], "sampleRole": "ویترین هویت برند و کمپین", "sampleHighlight": "نمایش پروژه‌های خلاقانه با چیدمان واکنش‌گرا در نمایشگرهای مختلف"}, {"id": "wp-design-store", "cat": "wp-design", "catLabel": "طراحی سایت وردپرسی", "subdomain": "wp-design-store.gikweb.com", "title": "فروشگاه تخصصی محصولات سبک زندگی", "summary": "طراحی فروشگاه وردپرسی با تمرکز بر نمایش جذاب محصول، سبد خرید سریع و تجربه خرید روان در موبایل.", "basePrice": 24000000, "palettes": [{"name": "پسته ای و عاجی", "bg": "#f5faf7", "card": "#ffffff", "accent": "#15803d", "soft": "#dcfce7", "text": "#14241a"}, {"name": "خردلی ملایم و قهوه‌ای تیره", "bg": "#fffbf0", "card": "#ffffff", "accent": "#b45309", "soft": "#fef3c7", "text": "#271d10"}, {"name": "آبی یخی و سرمه‌ای", "bg": "#f2f8fd", "card": "#ffffff", "accent": "#0369a1", "soft": "#e0f2fe", "text": "#122230"}], "addons": [{"id": "wps-quick", "title": "افزودن سریع به سبد و محاسبه لحظه‌ای جمع کل", "price": 3600000}, {"id": "wps-swatch", "title": "انتخاب‌گر رنگ، سایز و متریال روی کارت محصول", "price": 3100000}, {"id": "wps-bundle", "title": "پیشنهاد ست مکمل و تخفیف خرید ترکیبی", "price": 2900000}], "sampleRole": "فروشگاه کالای مصرفی و سبک زندگی", "sampleHighlight": "افزودن قلم به سبد خرید و به‌روزرسانی آنی تعداد و مبلغ کل"}, {"id": "wp-exec-corp", "cat": "wp-exec", "catLabel": "اجرای سایت وردپرسی", "subdomain": "wp-exec-corp.gikweb.com", "title": "پورتال سازمانی و B2B", "summary": "پیاده‌سازی فنی سبک، ساختار سئوی استاندارد، اسکیمای داده و سرعت بارگذاری بالا برای پورتال‌های سازمانی.", "basePrice": 16500000, "palettes": [{"name": "فولادی و آبی کاربنی", "bg": "#f4f7fb", "card": "#ffffff", "accent": "#1e40af", "soft": "#dbeafe", "text": "#131d33"}, {"name": "سبز کبریتی و خاکستری روشن", "bg": "#f3f8f7", "card": "#ffffff", "accent": "#115e59", "soft": "#ccfbf1", "text": "#122422"}, {"name": "بژ گرم و گرافیتی", "bg": "#faf8f5", "card": "#ffffff", "accent": "#374151", "soft": "#e5e7eb", "text": "#1f2937"}], "addons": [{"id": "wpec-schema", "title": "پیاده‌سازی اسکیمای JSON-LD سازمانی و نقشه سایت", "price": 2700000}, {"id": "wpec-speed", "title": "بهینه‌سازی Core Web Vitals، کش و فشرده‌سازی دارایی‌ها", "price": 3900000}, {"id": "wpec-sec", "title": "سخت‌سازی امنیت هدرها، فایروال و پشتیبان‌گیری", "price": 3300000}], "sampleRole": "اجرای سریع و سئو محور", "sampleHighlight": "تمرکز بر شاخص‌های سرعت موبایل، ساختار هدینگ و داده‌های ساختاریافته"}, {"id": "wp-exec-edu", "cat": "wp-exec", "catLabel": "اجرای سایت وردپرسی", "subdomain": "wp-exec-edu.gikweb.com", "title": "سامانه آموزشی و دوره‌های آنلاین", "summary": "اجرای ساختار منظم سرفصل‌ها، پیگیری پیشرفت یادگیری، صفحات فرود دوره و تجربه کاربری روان در گوشی.", "basePrice": 17500000, "palettes": [{"name": "بنفش ملایم و سفید", "bg": "#f9f6ff", "card": "#ffffff", "accent": "#6d28d9", "soft": "#ede9fe", "text": "#1d162e"}, {"name": "آبی لاجوردی و نعنایی", "bg": "#f3f9fc", "card": "#ffffff", "accent": "#0284c7", "soft": "#e0f2fe", "text": "#12222c"}, {"name": "هلویی روشن و بادمجونی", "bg": "#fff7f5", "card": "#ffffff", "accent": "#9d174d", "soft": "#fce7f3", "text": "#261620"}], "addons": [{"id": "wpee-prog", "title": "ماژول پیگیری درصد پیشرفت درس‌ها و سرفصل‌ها", "price": 3400000}, {"id": "wpee-faq", "title": "بخش پرسش‌های متداول و مسیر یادگیری مرحله‌به‌مرحله", "price": 2100000}, {"id": "wpee-lead", "title": "فرم ثبت‌نام سریع و دریافت سرفصل کامل دوره", "price": 2600000}], "sampleRole": "مدیریت دروس و پیشرفت یادگیرنده", "sampleHighlight": "امکان علامت‌گذاری درس‌ها و مشاهده لحظه‌ای میزان پیشرفت دوره"}, {"id": "webapp-crm", "cat": "webapp", "catLabel": "وب اپلیکیشن", "subdomain": "webapp-crm.gikweb.com", "title": "داشبورد مدیریت مشتریان و فروش", "summary": "وب اپلیکیشن تعاملی برای ثبت سرنخ‌ها، پیگیری وضعیت مذاکرات و مدیریت جریان فروش در دسکتاپ و موبایل.", "basePrice": 42000000, "palettes": [{"name": "آبی اقیانوسی و یخی", "bg": "#f1f8fc", "card": "#ffffff", "accent": "#0369a1", "soft": "#e0f2fe", "text": "#10212e"}, {"name": "زمردی و خاکستری صدفی", "bg": "#f2fbf7", "card": "#ffffff", "accent": "#047857", "soft": "#d1fae5", "text": "#11241e"}, {"name": "نیلی و یاسی روشن", "bg": "#f5f6ff", "card": "#ffffff", "accent": "#4338ca", "soft": "#e0e7ff", "text": "#161933"}], "addons": [{"id": "crm-pipe", "title": "ستون‌بندی مراحل قیف فروش و تغییر وضعیت آنی", "price": 6500000}, {"id": "crm-filter", "title": "فیلتر پیشرفته بر اساس مرحله، تاریخ و اولویت", "price": 4800000}, {"id": "crm-note", "title": "ثبت یادداشت پیگیری و تاریخچه تعامل با هر مشتری", "price": 4200000}], "sampleRole": "مدیریت مشتریان و قیف فروش", "sampleHighlight": "افزودن مشتری/سرنخ جدید و دسته‌بندی مرحله فروش به صورت زنده"}, {"id": "webapp-booking", "cat": "webapp", "catLabel": "وب اپلیکیشن", "subdomain": "webapp-booking.gikweb.com", "title": "سامانه رزرو و زمان‌بندی هوشمند", "summary": "وب اپلیکیشن رزرو نوبت و جلسه با انتخاب بازه زمانی، مدیریت ظرفیت و نمایش لحظه‌ای رزروهای ثبت‌شده.", "basePrice": 39000000, "palettes": [{"name": "فیروزه‌ای و نعنایی روشن", "bg": "#f2fbf8", "card": "#ffffff", "accent": "#0f766e", "soft": "#ccfbf1", "text": "#112523"}, {"name": "زعفرانی و کرم پاستلی", "bg": "#fffaf0", "card": "#ffffff", "accent": "#b45309", "soft": "#fef3c7", "text": "#261d11"}, {"name": "بنفش یاسی و آبی کمرنگ", "bg": "#f7f6ff", "card": "#ffffff", "accent": "#5b21b6", "soft": "#ede9fe", "text": "#1b162e"}], "addons": [{"id": "bk-slots", "title": "مدیریت بازه‌های زمانی فعال و جلوگیری از تداخل نوبت", "price": 5900000}, {"id": "bk-reminder", "title": "ساختار یادآوری خودکار زمان جلسه و لغو/تغییر نوبت", "price": 4400000}, {"id": "bk-list", "title": "نمای فهرست رزروهای روزانه و فیلتر سریع", "price": 3700000}], "sampleRole": "زمان‌بندی و رزرو آنلاین", "sampleHighlight": "ثبت رزرو جدید با انتخاب روز و ساعت و نمایش فوری در لیست"}];
+    let activeProjectId = null;
+    let activePaletteIdx = 0;
+    let localCaptchaExpected = 0;
+    let serverCaptchaId = '';
+    let localPendingOtp = '';
+    const cart = [];
+
+    function formatFa(num) { return Number(num || 0).toLocaleString('fa-IR') + ' تومان'; }
+    function getApiBase() { return (document.getElementById('apiBaseInput')?.value || '').trim().replace(/\/+$/, ''); }
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      document.getElementById('themeToggle').textContent = document.body.classList.contains('dark') ? 'تم روشن' : 'تم تیره';
+    }
+    function scrollToSection(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+
+    function renderPortfolio(cat = 'all') {
+      const grid = document.getElementById('portfolioGrid');
+      const list = cat === 'all' ? PROJECTS : PROJECTS.filter(p => p.cat === cat);
+      grid.innerHTML = list.map(p => `
+        <article class="card">
+          <div>
+            <span class="tag">${p.catLabel}</span>
+            <h3 style="margin-top:10px; font-size:1.05rem;">${p.title}</h3>
+            <p style="color:var(--p-muted); font-size:0.86rem; margin-top:6px;">${p.summary}</p>
+            <div class="price-line">قیمت پایه: ${formatFa(p.basePrice)}</div>
+          </div>
+          <div>
+            <div class="sub-url" style="margin-bottom:10px;">${p.subdomain}</div>
+            <button type="button" class="btn-enter" onclick="openProjectWorkspace('${p.id}')">ورود به فضای پروژه</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function filterPortfolio(cat, btn) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderPortfolio(cat);
+    }
+
+    function applyPaletteVars(pal) {
+      const root = document.getElementById('isolatedProjectView');
+      root.style.setProperty('--proj-bg', pal.bg);
+      root.style.setProperty('--proj-card', pal.card);
+      root.style.setProperty('--proj-accent', pal.accent);
+      root.style.setProperty('--proj-soft', pal.soft);
+      root.style.setProperty('--proj-text', pal.text);
+    }
+
+    function openProjectWorkspace(id) {
+      const proj = PROJECTS.find(x => x.id === id);
+      if (!proj) return;
+      activeProjectId = id;
+      activePaletteIdx = 0;
+      document.getElementById('mainSiteWrapper').style.display = 'none';
+      document.getElementById('isolatedProjectView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      applyPaletteVars(proj.palettes[0]);
+      renderPaletteBar(proj);
+      renderProjectBody(proj);
+    }
+
+    function exitProjectWorkspace() {
+      activeProjectId = null;
+      document.getElementById('isolatedProjectView').style.display = 'none';
+      document.getElementById('mainSiteWrapper').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderPaletteBar(proj) {
+      document.getElementById('paletteSwitcher').innerHTML = proj.palettes.map((pal, idx) => `
+        <button type="button" class="palette-btn ${idx === activePaletteIdx ? 'active' : ''}" onclick="selectPalette(${idx})">
+          <span class="swatch" style="background:${pal.accent}"></span>
+          <span>${pal.name}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectPalette(idx) {
+      const proj = PROJECTS.find(x => x.id === activeProjectId);
+      if (!proj || !proj.palettes[idx]) return;
+      activePaletteIdx = idx;
+      applyPaletteVars(proj.palettes[idx]);
+      renderPaletteBar(proj);
+      const badge = document.getElementById('activePaletteName');
+      if (badge) badge.textContent = proj.palettes[idx].name;
+    }
+
+    function renderProjectBody(proj) {
+      const addonsHtml = proj.addons.map(a => `
+        <div class="addon-row">
+          <label>
+            <input type="checkbox" class="proj-addon-cb" value="${a.id}" data-price="${a.price}" data-title="${a.title}" onchange="recalcProjectTotal(${proj.basePrice})" />
+            <span>${a.title}</span>
+          </label>
+          <strong>+${formatFa(a.price)}</strong>
+        </div>
+      `).join('');
+
+      document.getElementById('projectDynamicContent').innerHTML = `
+        <div class="proj-grid">
+          <div class="proj-card">
+            <div style="font-size:0.8rem; opacity:0.75;">${proj.subdomain} • پالت فعال: <strong id="activePaletteName">${proj.palettes[activePaletteIdx].name}</strong></div>
+            <h1 style="font-size:1.45rem; margin-top:6px;">${proj.title}</h1>
+            <p style="font-size:0.92rem; margin-top:8px; opacity:0.88;">${proj.summary}</p>
+            <div style="margin-top:16px; padding:14px; border-radius:14px; background:var(--proj-soft);">
+              <div style="font-weight:700; font-size:0.9rem;">سناریوی تعاملی نمونه (${proj.sampleRole})</div>
+              <p style="font-size:0.85rem; margin-top:4px;">${proj.sampleHighlight}</p>
+            </div>
+          </div>
+          <div class="proj-card">
+            <h2 style="font-size:1.1rem;">قابلیت‌های اختصاصی قیمت‌دار پروژه</h2>
+            <p style="font-size:0.84rem; opacity:0.8; margin-top:4px;">قیمت پایه پروژه: <strong>${formatFa(proj.basePrice)}</strong></p>
+            <div style="margin-top:10px;">${addonsHtml}</div>
+            <div style="margin-top:14px;">
+              <label for="projCustomDesc" style="color:inherit; font-weight:700;">توضیحات اختصاصی شما برای این پروژه</label>
+              <textarea id="projCustomDesc" placeholder="نیازها یا نکات تکمیلی خود را بنویسید..."></textarea>
+            </div>
+            <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center; font-weight:800;">
+              <span>مبلغ نهایی این آیتم:</span>
+              <span id="projCalculatedTotal">${formatFa(proj.basePrice)}</span>
+            </div>
+            <button type="button" class="proj-cta" onclick="addConfiguredProjectToCart('${proj.id}')">افزودن به سبد خرید و بازگشت به گیک‌وب</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function recalcProjectTotal(basePrice) {
+      let sum = Number(basePrice || 0);
+      document.querySelectorAll('.proj-addon-cb:checked').forEach(cb => { sum += Number(cb.dataset.price || 0); });
+      const el = document.getElementById('projCalculatedTotal');
+      if (el) el.textContent = formatFa(sum);
+    }
+
+    function addConfiguredProjectToCart(projId) {
+      const proj = PROJECTS.find(x => x.id === projId);
+      if (!proj) return;
+      const selectedAddons = [];
+      let totalPrice = proj.basePrice;
+      document.querySelectorAll('.proj-addon-cb:checked').forEach(cb => {
+        const price = Number(cb.dataset.price || 0);
+        totalPrice += price;
+        selectedAddons.push({ id: cb.value, title: cb.dataset.title, price });
+      });
+      const customDesc = (document.getElementById('projCustomDesc')?.value || '').trim();
+      const paletteName = proj.palettes[activePaletteIdx]?.name || '';
+      cart.push({
+        cartId: 'ITEM-' + Math.floor(100000 + Math.random() * 900000),
+        projectId: proj.id,
+        title: proj.title,
+        subdomain: proj.subdomain,
+        paletteName,
+        addons: selectedAddons,
+        description: customDesc,
+        totalPrice
+      });
+      renderCart();
+      exitProjectWorkspace();
+      scrollToSection('cart-panel');
+    }
+
+    function removeCartItem(cartId) {
+      const idx = cart.findIndex(c => c.cartId === cartId);
+      if (idx !== -1) { cart.splice(idx, 1); renderCart(); }
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartItemsContainer');
+      const countEl = document.getElementById('headerCartCount');
+      const totalEl = document.getElementById('cartGrandTotal');
+      countEl.textContent = cart.length.toLocaleString('fa-IR');
+      if (!cart.length) {
+        container.innerHTML = '<p style="color:var(--p-muted); margin-top:12px; font-size:0.9rem;">سبد خرید شما خالی است.</p>';
+        totalEl.textContent = '۰ تومان';
+        return;
+      }
+      const grandTotal = cart.reduce((acc, item) => acc + item.totalPrice, 0);
+      totalEl.textContent = formatFa(grandTotal);
+      container.innerHTML = cart.map(item => `
+        <div class="cart-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div><strong>${item.title}</strong> <span style="font-size:0.8rem; color:var(--p-muted);">(${item.subdomain} • پالت: ${item.paletteName})</span></div>
+            <div>
+              <strong>${formatFa(item.totalPrice)}</strong>
+              <button type="button" class="btn-ghost" style="margin-right:8px; padding:4px 10px;" onclick="removeCartItem('${item.cartId}')">حذف</button>
+            </div>
+          </div>
+          ${item.addons.length ? `<div style="font-size:0.84rem; margin-top:8px;">قابلیت‌ها: ${item.addons.map(a => `${a.title} (${formatFa(a.price)})`).join('، ')}</div>` : ''}
+          ${item.description ? `<div style="font-size:0.85rem; margin-top:6px; padding:8px 10px; border-radius:10px; background:var(--p-surface);">توضیحات: ${item.description}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function setLocalCaptcha() {
+      const a = Math.floor(Math.random() * 8) + 2;
+      const b = Math.floor(Math.random() * 8) + 1;
+      localCaptchaExpected = a + b;
+      serverCaptchaId = '';
+      document.getElementById('captchaLabel').textContent = `کد امنیتی: حاصل ${a} + ${b} چند است؟`;
+      document.getElementById('captchaInput').value = '';
+    }
+
+    async function refreshCaptcha() {
+      const base = getApiBase();
+      if (!base) return setLocalCaptcha();
+      try {
+        const res = await fetch(`${base}/captcha/challenge`, { method: 'POST' });
+        if (!res.ok) throw new Error('API unavailable');
+        const data = await res.json();
+        serverCaptchaId = data.captchaId;
+        document.getElementById('captchaLabel').textContent = `کد امنیتی: ${data.question}`;
+        document.getElementById('captchaInput').value = '';
+      } catch {
+        setLocalCaptcha();
+      }
+    }
+
+    function showNotice(msg) {
+      const el = document.getElementById('statusNotice');
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+
+    async function sendOtp() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      const capAns = document.getElementById('captchaInput').value.trim();
+      if (!/^09\d{9}$/.test(phone)) return showNotice('شماره موبایل ۱۱ رقمی معتبر وارد کنید.');
+
+      const base = getApiBase();
+      if (base && serverCaptchaId) {
+        try {
+          const res = await fetch(`${base}/auth/request-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, captchaId: serverCaptchaId, captchaAnswer: capAns })
+          });
+          const data = await res.json();
+          if (!res.ok) return showNotice(data.message || 'خطا در ارسال کد.');
+          if (data.devOtp) document.getElementById('otpInput').value = data.devOtp;
+          await refreshCaptcha();
+          return showNotice(`${data.message} ${data.devOtp ? `(کد تست سرور: ${data.devOtp})` : ''}`);
+        } catch {}
+      }
+
+      if (Number(capAns) !== localCaptchaExpected) {
+        setLocalCaptcha();
+        return showNotice('پاسخ کپچا اشتباه است.');
+      }
+      localPendingOtp = String(Math.floor(100000 + Math.random() * 900000));
+      document.getElementById('otpInput').value = localPendingOtp;
+      setLocalCaptcha();
+      showNotice(`کد یک‌بار مصرف آزمایشی ایجاد شد: ${localPendingOtp}`);
+    }
+
+    async function submitCartOrder() {
+      if (!cart.length) return showNotice('ابتدا حداقل یک مورد را به سبد خرید اضافه کنید.');
+      const phone = document.getElementById('phoneInput').value.trim();
+      const otp = document.getElementById('otpInput').value.trim();
+      const gateway = document.getElementById('gatewaySelect').value;
+      if (!/^09\d{9}$/.test(phone)) return showNotice('شماره موبایل معتبر وارد کنید.');
+
+      const base = getApiBase();
+      const total = cart.reduce((acc, i) => acc + i.totalPrice, 0);
+      if (base) {
+        try {
+          const vRes = await fetch(`${base}/auth/verify-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, otp })
+          });
+          const vData = await vRes.json();
+          if (!vRes.ok) return showNotice(vData.message || 'تایید کد ناموفق بود.');
+
+          const oRes = await fetch(`${base}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: vData.userId, totalAmountRial: total * 10, gatewayCode: gateway, items: cart })
+          });
+          const oData = await oRes.json();
+          if (!oRes.ok) return showNotice(oData.message || 'خطا در ثبت سفارش.');
+          return showNotice(`سفارش ${oData.order.id} در بک‌اند ثبت شد. لینک پرداخت: ${oData.paymentUrl}`);
+        } catch {}
+      }
+
+      if (!localPendingOtp || otp !== localPendingOtp) return showNotice('کد یک‌بار مصرف نامعتبر است.');
+      localPendingOtp = '';
+      showNotice(`سفارش آزمایشی شامل ${cart.length} آیتم به مبلغ ${formatFa(total)} از طریق ${gateway} ثبت شد.`);
+    }
+
+    renderPortfolio();
+    renderCart();
+    refreshCaptcha();
+  </script>
+</body>
+</html>
